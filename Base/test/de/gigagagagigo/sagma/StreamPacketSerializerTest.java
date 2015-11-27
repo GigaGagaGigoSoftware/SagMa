@@ -12,11 +12,30 @@ import de.gigagagagigo.sagma.packet.StreamPacketSerializer;
 
 public class StreamPacketSerializerTest {
 
+	@Test(expected = NullPointerException.class)
+	public void constructorThrowsOnNull() {
+		new StreamPacketSerializer(null);
+	}
+
 	@Test
 	public void testTrueIsWrittenAs1() {
 		OutputStreamMock mock = new OutputStreamMock(new int[] { 1 });
 		PacketSerializer s = new StreamPacketSerializer(mock);
 		s.writeBoolean(true);
+		assertTrue(mock.successful());
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void testWriteStringThrowsOnNull() {
+		PacketSerializer s = new StreamPacketSerializer(new OutputStreamMock(new int[0]));
+		s.writeString(null);
+	}
+
+	@Test
+	public void testWriteString() {
+		OutputStreamMock mock = new OutputStreamMock(new int[] { 0, 0, 0, 4, 0x54, 0x65, 0x73, 0x74 });
+		PacketSerializer s = new StreamPacketSerializer(mock);
+		s.writeString("Test");
 		assertTrue(mock.successful());
 	}
 

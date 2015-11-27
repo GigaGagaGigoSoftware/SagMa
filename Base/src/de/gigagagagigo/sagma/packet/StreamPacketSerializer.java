@@ -2,13 +2,14 @@ package de.gigagagagigo.sagma.packet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 
 public class StreamPacketSerializer implements PacketSerializer {
 
 	private final OutputStream out;
 
 	public StreamPacketSerializer(OutputStream out) {
-		this.out = out;
+		this.out = Objects.requireNonNull(out, "out must not be null.");
 	}
 
 	@Override
@@ -23,7 +24,14 @@ public class StreamPacketSerializer implements PacketSerializer {
 	public void writeShort(short s) {}
 
 	@Override
-	public void writeInt(int i) {}
+	public void writeInt(int i) {
+		handleException(o -> {
+			o.write(i >> 24);
+			o.write(i >> 16);
+			o.write(i >> 8);
+			o.write(i);
+		});
+	}
 
 	@Override
 	public void writeLong(long l) {}
@@ -38,7 +46,14 @@ public class StreamPacketSerializer implements PacketSerializer {
 	public void writeChar(char c) {}
 
 	@Override
-	public void writeString(String s) {}
+	public void writeString(String s) {
+		handleException(o -> {
+			Objects.requireNonNull(s, "s must not be null.");
+			byte[] data = s.getBytes("UTF-8");
+			writeInt(data.length);
+			o.write(data);
+		});
+	}
 
 	@FunctionalInterface
 	private static interface WriteFunction {

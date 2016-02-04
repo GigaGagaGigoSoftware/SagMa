@@ -1,3 +1,3 @@
 package de.gigagagagigo.sagma.packet;
 
-public interface Packet {} // marker interface
+public interface Packet extends PacketPart {} // marker interface

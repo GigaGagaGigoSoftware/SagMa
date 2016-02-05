@@ -1,13 +1,13 @@
-package de.gigagagagigo.sagma.packet.mapper;
+package de.gigagagagigo.sagma.packet;
 
 import java.io.*;
 import java.util.Objects;
 
-public class MappedOutputStream implements AutoCloseable {
+public class PacketDataOutputStream implements AutoCloseable {
 
 	private final DataOutputStream out;
 
-	public MappedOutputStream(OutputStream out) {
+	public PacketDataOutputStream(OutputStream out) {
 		this.out = new DataOutputStream(Objects.requireNonNull(out, "out must not be null."));
 	}
 
@@ -44,11 +44,14 @@ public class MappedOutputStream implements AutoCloseable {
 	}
 
 	public void writeString(String data) throws IOException {
-		write(String.class, data);
-	}
-
-	public <T> void write(Class<T> theClass, T data) throws IOException {
-		MapperRegistry.getMapper(theClass).write(this, data);
+		if (data == null) {
+			out.writeInt(-1);
+		} else {
+			byte[] bytes = data.getBytes("UTF-8");
+			out.writeInt(bytes.length);
+			for (int i = 0; i < bytes.length; i++)
+				out.writeByte(bytes[i]);
+		}
 	}
 
 	@Override

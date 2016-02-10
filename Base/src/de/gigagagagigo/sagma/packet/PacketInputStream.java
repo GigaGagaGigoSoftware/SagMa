@@ -11,6 +11,16 @@ public class PacketInputStream implements AutoCloseable {
 		this.in = new PacketDataInputStream(in);
 	}
 
+	@SuppressWarnings("unchecked")
+	public <P extends Packet> P read(Class<P> packetClass) {
+		Packet packet = read();
+		if (packet != null && !packetClass.isInstance(packet)) {
+			throw new PacketException("Expected packet of type '" + packetClass.getName()
+				+ "', but found '" + packet.getClass().getName() + "' instead.");
+		}
+		return (P) packet;
+	}
+
 	public Packet read() {
 		try {
 			return tryRead();

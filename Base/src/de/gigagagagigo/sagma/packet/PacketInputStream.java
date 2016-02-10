@@ -12,7 +12,7 @@ public class PacketInputStream implements AutoCloseable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <P extends Packet> P read(Class<P> packetClass) {
+	public synchronized <P extends Packet> P read(Class<P> packetClass) {
 		Packet packet = read();
 		if (packet != null && !packetClass.isInstance(packet)) {
 			throw new PacketException("Expected packet of type '" + packetClass.getName()
@@ -21,7 +21,7 @@ public class PacketInputStream implements AutoCloseable {
 		return (P) packet;
 	}
 
-	public Packet read() {
+	public synchronized Packet read() {
 		try {
 			return tryRead();
 		} catch (IOException e) {
@@ -55,7 +55,7 @@ public class PacketInputStream implements AutoCloseable {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
 		in.close();
 	}
 

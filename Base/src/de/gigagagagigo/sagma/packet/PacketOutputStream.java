@@ -11,7 +11,7 @@ public class PacketOutputStream implements AutoCloseable {
 		this.out = new PacketDataOutputStream(out);
 	}
 
-	public void write(Packet packet) {
+	public synchronized void write(Packet packet) {
 		try {
 			tryWrite(packet);
 		} catch (IOException e) {
@@ -34,7 +34,7 @@ public class PacketOutputStream implements AutoCloseable {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public synchronized void close() throws IOException {
 		out.close();
 	}
 

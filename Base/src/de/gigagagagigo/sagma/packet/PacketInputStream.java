@@ -12,24 +12,16 @@ public class PacketInputStream implements AutoCloseable {
 	}
 
 	@SuppressWarnings("unchecked")
-	public synchronized <P extends Packet> P read(Class<P> packetClass) {
+	public synchronized <P extends Packet> P read(Class<P> packetClass) throws IOException {
 		Packet packet = read();
 		if (packet != null && !packetClass.isInstance(packet)) {
-			throw new PacketException("Expected packet of type '" + packetClass.getName()
+			throw new IOException("Expected packet of type '" + packetClass.getName()
 				+ "', but found '" + packet.getClass().getName() + "' instead.");
 		}
 		return (P) packet;
 	}
 
-	public synchronized Packet read() {
-		try {
-			return tryRead();
-		} catch (IOException e) {
-			throw new PacketException(e);
-		}
-	}
-
-	private Packet tryRead() throws IOException {
+	public synchronized Packet read() throws IOException {
 		String className = in.readString();
 		if (className == null) {
 			return null;
@@ -42,7 +34,7 @@ public class PacketInputStream implements AutoCloseable {
 		try {
 			return tryReadNonNull(className);
 		} catch (ReflectiveOperationException e) {
-			throw new PacketException(e);
+			throw new IOException(e);
 		}
 	}
 

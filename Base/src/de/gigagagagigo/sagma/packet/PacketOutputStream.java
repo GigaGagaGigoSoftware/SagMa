@@ -11,23 +11,15 @@ public class PacketOutputStream implements AutoCloseable {
 		this.out = new PacketDataOutputStream(out);
 	}
 
-	public synchronized void write(Packet packet) {
-		try {
-			tryWrite(packet);
-		} catch (IOException e) {
-			throw new PacketException(e);
-		}
-	}
-
-	private void tryWrite(Packet packet) throws IOException {
+	public synchronized void write(Packet packet) throws IOException {
 		if (packet == null) {
 			out.writeString(null);
 		} else {
-			tryWriteNonNull(packet);
+			writeNonNull(packet);
 		}
 	}
 
-	private void tryWriteNonNull(Packet packet) throws IOException {
+	private void writeNonNull(Packet packet) throws IOException {
 		Class<?> packetClass = packet.getClass();
 		out.writeString(packetClass.getName());
 		packet.write(out);

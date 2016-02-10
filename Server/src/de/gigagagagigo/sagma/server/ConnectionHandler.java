@@ -27,10 +27,14 @@ public class ConnectionHandler implements Runnable {
 	}
 
 	public void sendMessage(String username, String message) {
-		ChatMessagePacket chatMessage = new ChatMessagePacket();
-		chatMessage.username = username;
-		chatMessage.message = message;
-		out.write(chatMessage);
+		try {
+			ChatMessagePacket chatMessage = new ChatMessagePacket();
+			chatMessage.username = username;
+			chatMessage.message = message;
+			out.write(chatMessage);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -39,12 +43,14 @@ public class ConnectionHandler implements Runnable {
 			if (checkVersion() && logIn()) {
 				listen();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		} finally {
 			close();
 		}
 	}
 
-	private boolean checkVersion() {
+	private boolean checkVersion() throws IOException {
 		VersionCheckRequestPacket request = in.read(VersionCheckRequestPacket.class);
 		boolean success = (request.clientVersion == SagMa.VERSION);
 		VersionCheckReplyPacket reply = new VersionCheckReplyPacket();
@@ -54,7 +60,7 @@ public class ConnectionHandler implements Runnable {
 		return success;
 	}
 
-	private boolean logIn() {
+	private boolean logIn() throws IOException {
 		LogInRequestPacket request = in.read(LogInRequestPacket.class);
 		this.username = request.username;
 		boolean success = server.register(this.username, this);
@@ -64,7 +70,7 @@ public class ConnectionHandler implements Runnable {
 		return success;
 	}
 
-	private void listen() {
+	private void listen() throws IOException {
 		while (true) {
 			Packet packet = in.read();
 			if (packet instanceof ChatMessagePacket) {
@@ -81,7 +87,7 @@ public class ConnectionHandler implements Runnable {
 		server.sendMessage(this.username, chatMessage.username, chatMessage.message);
 	}
 
-	private void handleUserListRequest(UserListRequestPacket request) {
+	private void handleUserListRequest(UserListRequestPacket request) throws IOException {
 		UserListReplyPacket reply = new UserListReplyPacket();
 		reply.users = server.getUsers();
 		out.write(reply);

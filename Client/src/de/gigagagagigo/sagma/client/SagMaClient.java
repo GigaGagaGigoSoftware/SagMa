@@ -20,11 +20,11 @@ public class SagMaClient implements AutoCloseable {
 		out = new PacketOutputStream(socket.getOutputStream());
 	}
 
-	public boolean start(String username) {
+	public boolean start(String username) throws IOException {
 		return checkVersion() && logIn(username);
 	}
 
-	private boolean checkVersion() {
+	private boolean checkVersion() throws IOException {
 		VersionCheckRequestPacket request = new VersionCheckRequestPacket();
 		request.clientVersion = SagMa.VERSION;
 		out.write(request);
@@ -32,7 +32,7 @@ public class SagMaClient implements AutoCloseable {
 		return reply.success;
 	}
 
-	private boolean logIn(String username) {
+	private boolean logIn(String username) throws IOException {
 		LogInRequestPacket request = new LogInRequestPacket();
 		request.username = username;
 		out.write(request);
@@ -40,7 +40,7 @@ public class SagMaClient implements AutoCloseable {
 		return reply.success;
 	}
 
-	public String[] getUserList() {
+	public String[] getUserList() throws IOException {
 		UserListRequestPacket request = new UserListRequestPacket();
 		out.write(request);
 		UserListReplyPacket reply = in.read(UserListReplyPacket.class);

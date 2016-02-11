@@ -2,12 +2,14 @@ package de.gigagagagigo.sagma.client.ui.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
+import de.gigagagagigo.sagma.packet.Packet;
+import de.gigagagagigo.sagma.packets.UserListReplyPacket;
+import de.gigagagagigo.sagma.packets.UserListRequestPacket;
 
 public class ListFrame extends JFrame {
 
@@ -18,6 +20,7 @@ public class ListFrame extends JFrame {
 
 	public ListFrame(SagMaClient client) {
 		this.client = client;
+		client.setPacketHandler(this::handlePacket);
 		list = new JList<>();
 		update = new JButton("Aktualisieren");
 		update.addActionListener(e -> update());
@@ -39,29 +42,20 @@ public class ListFrame extends JFrame {
 
 	private void update() {
 		update.setEnabled(false);
-		new SwingWorker<String[], Void>() {
-			@Override
-			protected String[] doInBackground() throws Exception {
-				return client.getUserList();
-			}
+		client.sendPacket(new UserListRequestPacket());
+	}
 
-			@Override
-			protected void done() {
-				try {
-					DefaultListModel<String> model = new DefaultListModel<>();
-					String[] users = get();
-					for (String user : users) {
-						model.addElement(user);
-					}
-					list.setModel(model);
-				} catch (InterruptedException | ExecutionException e) {
-					e.printStackTrace();
-				} finally {
-					update.setEnabled(true);
-				}
-			};
-
-		}.execute();
+	private void handlePacket(Packet packet) {
+		if (packet instanceof UserListReplyPacket) {
+			UserListReplyPacket reply = (UserListReplyPacket) packet;
+			SwingUtilities.invokeLater(() -> {
+				DefaultListModel<String> model = new DefaultListModel<>();
+				for (String user : reply.users)
+					model.addElement(user);
+				list.setModel(model);
+				update.setEnabled(true);
+			});
+		}
 	}
 
 }

@@ -2,54 +2,39 @@ package de.gigagagagigo.sagma.client;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicReference;
 
 import de.gigagagagigo.sagma.SagMa;
-import de.gigagagagigo.sagma.packet.PacketInputStream;
-import de.gigagagagigo.sagma.packet.PacketOutputStream;
-import de.gigagagagigo.sagma.packets.*;
+import de.gigagagagigo.sagma.packet.Packet;
 
-public class SagMaClient implements AutoCloseable {
+public class SagMaClient {
 
-	private final Socket socket;
-	private final PacketInputStream in;
-	private final PacketOutputStream out;
+	private final BlockingQueue<Packet> queue = new LinkedBlockingQueue<>();
+	private final AtomicReference<PacketHandler> handlerReference = new AtomicReference<>();
 
-	public SagMaClient(String server) throws IOException {
-		socket = new Socket(server, SagMa.PORT);
-		in = new PacketInputStream(socket.getInputStream());
-		out = new PacketOutputStream(socket.getOutputStream());
+	public void start(String server) {
+		new Thread(() -> {
+			try {
+				@SuppressWarnings("resource")
+				// Do not close the socket here, because we are starting the server.
+				// The socket will be closed if one of the io streams created here is closed.
+				Socket socket = new Socket(server, SagMa.PORT);
+				new Thread(new PacketWriter(queue, socket.getOutputStream())).start();
+				new Thread(new PacketReader(socket.getInputStream(), handlerReference)).start();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}).start();
 	}
 
-	public boolean start(String username) throws IOException {
-		return checkVersion() && logIn(username);
+	public void sendPacket(Packet packet) {
+		queue.add(packet);
 	}
 
-	private boolean checkVersion() throws IOException {
-		VersionCheckRequestPacket request = new VersionCheckRequestPacket();
-		request.clientVersion = SagMa.VERSION;
-		out.write(request);
-		VersionCheckReplyPacket reply = in.read(VersionCheckReplyPacket.class);
-		return reply.success;
-	}
-
-	private boolean logIn(String username) throws IOException {
-		LogInRequestPacket request = new LogInRequestPacket();
-		request.username = username;
-		out.write(request);
-		LogInReplyPacket reply = in.read(LogInReplyPacket.class);
-		return reply.success;
-	}
-
-	public String[] getUserList() throws IOException {
-		UserListRequestPacket request = new UserListRequestPacket();
-		out.write(request);
-		UserListReplyPacket reply = in.read(UserListReplyPacket.class);
-		return reply.users;
-	}
-
-	@Override
-	public void close() throws IOException {
-		socket.close();
+	public void setPacketHandler(PacketHandler handler) {
+		handlerReference.set(handler);
 	}
 
 }

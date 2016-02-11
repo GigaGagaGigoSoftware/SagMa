@@ -10,6 +10,8 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.EmptyBorder;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
+import de.gigagagagigo.sagma.packets.LogInReplyPacket;
+import de.gigagagagigo.sagma.packets.LogInRequestPacket;
 
 public class StartFrame extends JFrame implements ActionListener {
 
@@ -59,30 +61,27 @@ public class StartFrame extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		ok.setEnabled(false);
-		new SwingWorker<SagMaClient, Void>() {
-
-			@Override
-			protected SagMaClient doInBackground() throws Exception {
-				SagMaClient client = new SagMaClient(server.getText());
-				boolean success = client.start(username.getText());
-				return success ? client : null;
-			}
-
-			@Override
-			protected void done() {
-				try {
-					SagMaClient client = get();
-					if (client != null) {
+		SagMaClient client = new SagMaClient();
+		client.setPacketHandler(p -> {
+			if (p instanceof LogInReplyPacket) {
+				LogInReplyPacket reply = (LogInReplyPacket) p;
+				if (reply.success) {
+					SwingUtilities.invokeLater(() -> {
 						setVisible(false);
 						dispose();
 						new ListFrame(client);
-					} else {
-						ok.setEnabled(true);
-					}
-				} catch (Exception ignore) {}
-			};
-
-		}.execute();
+					});
+				} else {
+					SwingUtilities.invokeLater(() -> ok.setEnabled(true));
+				}
+			} else {
+				SwingUtilities.invokeLater(() -> ok.setEnabled(true));
+			}
+		});
+		client.start(server.getText());
+		LogInRequestPacket request = new LogInRequestPacket();
+		request.username = username.getText();
+		client.sendPacket(request);
 	}
 
 }

@@ -22,21 +22,21 @@
           <Menu id="mSagMa" mnemonicParsing="false" text="SagMa">
             <items>
               <MenuItem id="miClose" mnemonicParsing="false" text="Close" />
-                  <MenuItem id="miNameChange" mnemonicParsing="false" text="Namen ändern" />
-                  <MenuItem id="miLogOut" mnemonicParsing="false" text="Abmelden" />
-                  <MenuItem id="miStatus" mnemonicParsing="false" text="Onlinestatus" />
+              <MenuItem id="miNameChange" mnemonicParsing="false" text="Namen ändern" />
+              <MenuItem id="miStatus" mnemonicParsing="false" text="Onlinestatus" />
+              <MenuItem id="miLogOut" mnemonicParsing="false" text="Abmelden" />
             </items>
           </Menu>
           <Menu id="mActions" mnemonicParsing="false" text="Aktionen">
             <items>
               <MenuItem id="miChangeLanguage" mnemonicParsing="false" text="Sprache ändern" />
-                  <MenuItem id="miOptions" mnemonicParsing="false" text="Optionen" />
+              <MenuItem id="miOptions" mnemonicParsing="false" text="Optionen" />
             </items>
           </Menu>
           <Menu id="mHelp" mnemonicParsing="false" text="Hilfe">
             <items>
               <MenuItem id="miAbout" mnemonicParsing="false" text="über SagMa" />
-                  <MenuItem id="miTerms" mnemonicParsing="false" text="Nutzungsbedingungen" />
+              <MenuItem id="miTerms" mnemonicParsing="false" text="Nutzungsbedingungen" />
             </items>
           </Menu>
         </menus>
@@ -104,7 +104,7 @@
                                     </HBox>
                                  </top>
                                  <center>
-                                    <TreeView id="userTree" BorderPane.alignment="CENTER" />
+        	                            <TreeView id="userTree" BorderPane.alignment="CENTER" />
                                  </center>
                               </BorderPane>
                            </children>

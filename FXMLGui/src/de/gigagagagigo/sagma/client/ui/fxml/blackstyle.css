@@ -1,15 +1,26 @@
 
 
-#maincon, .split-pane{
+#mainPane, .split-pane{
 	-fx-background-color: #000000;
 }
-.label, #menu{
+.label, #menuBar{
 	-fx-text-fill: white;
 	-fx-background-color: transparent;
 }
 
-#groups, #activechats, #activelist, #grouppane, #grouptree, #grouptree .tree-cell{
+#userPane, #activeChatsPane{
 	-fx-background-color: #323232;
+}
+
+#activeChatsList, #userTree, .tree-cell{
+	-fx-background-color: #323232;
+}
+
+#activeChatsLabelPane, #userLabelPane{
+	-fx-background-color:
+		linear-gradient(#2E1300 0%, #733000 50%, #2E1300 100%);
+	-fx-background-insets:0.0;
+	-fx-background-radius: 9;
 }
 
 .split-pane > .split-pane-divider{
@@ -23,24 +34,24 @@
    	-fx-background-radius: 9,8,5,4,3;
 }
 
-#menu{
+#menuBar{
 	-fx-background-color:
 		linear-gradient(#2E1300 0%, #733000 50%, #2E1300 100%);
 	-fx-background-insets:0.0;
 	-fx-background-radius: 9;
 }
-#menu .menu{
+#menuBar .menu{
 	-fx-background-color: transparent;
 }
-#menu .menu:showing, #menu .menu:hover{
+#menuBar .menu:showing, #menuBar .menu:hover{
 	-fx-background-color:
 		linear-gradient(#1E1300 0%, #633000 50%, #1E1300 100%);
 }
-#menu .menu .context-menu{
+#menuBar .menu .context-menu{
 	-fx-background-color:
 		linear-gradient(#1E1300 0%, #633000 50%, #1E1300 100%);
 }
-#menu .menu .menu-item{
+#menuBar .menu .menu-item{
 	-fx-background-color:transparent;
 }
 
@@ -49,41 +60,32 @@
 		linear-gradient(#2E1300 0%, #733000 20%, #2E1300 100%);
 }
 
-#chat{
+#messageSplit, #chatChoiceSplit{
 	-fx-background-color: black;
 }
 
-#chathistory{
+#messagePane{
 	-fx-background-color: #323232;
 }
-#chatinput{
+#sendPane{
 	-fx-background-color:#000000;
 	-fx-text-box-border: red;
 }
-#chatinput .content{
+#sendPane .content{
 	-fx-background-color: #666666;
 	-fx-border-width:0,0,0,0;
 }
 
-#chatinput .textarea{
+#sendPane .textarea{
 	-fx-background-color: #777777;
 }
 
-#messageoptions{
+#messageoptionPane{
 	-fx-max-height: 30px;
 }
 
-#selection{
-	-fx-max-width: 150px;
-	-fx-pref-width: 100px;
-}
 
-#activechats{
-	-fx-background-color: #323232;
-}
-
-
-#sendbutton {
+#bSend {
 	-fx-min-width: 90px;
 	-fx-pref-height: Infinity;
 
@@ -96,7 +98,7 @@
   -fx-alignment: baseline-center ;
 }
 
-#sendbutton:hover {
+#bSend:hover {
 	-fx-background-color:
 		linear-gradient(#000000 0%, #565656 50%, #000000 100%);
 }

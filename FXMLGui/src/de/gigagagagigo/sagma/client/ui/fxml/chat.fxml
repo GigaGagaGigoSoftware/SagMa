@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+
+
+<BorderPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <MenuBar id="menuBar" BorderPane.alignment="CENTER">
+        <menus>
+          <Menu id="mSagMa" mnemonicParsing="false" text="SagMa">
+            <items>
+              <MenuItem id="miClose" mnemonicParsing="false" text="Close" />
+                  <MenuItem id="miNameChange" mnemonicParsing="false" text="Namen ändern" />
+                  <MenuItem id="miLogOut" mnemonicParsing="false" text="Abmelden" />
+                  <MenuItem id="miStatus" mnemonicParsing="false" text="Onlinestatus" />
+            </items>
+          </Menu>
+          <Menu id="mActions" mnemonicParsing="false" text="Aktionen">
+            <items>
+              <MenuItem id="miChangeLanguage" mnemonicParsing="false" text="Sprache ändern" />
+                  <MenuItem id="miOptions" mnemonicParsing="false" text="Optionen" />
+            </items>
+          </Menu>
+          <Menu id="mHelp" mnemonicParsing="false" text="Hilfe">
+            <items>
+              <MenuItem id="miAbout" mnemonicParsing="false" text="über SagMa" />
+                  <MenuItem id="miTerms" mnemonicParsing="false" text="Nutzungsbedingungen" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <SplitPane id="mainSplit" dividerPositions="0.65" BorderPane.alignment="CENTER">
+        <items>
+          <AnchorPane id="messageMainPane">
+               <children>
+                  <SplitPane id="messageSplit" dividerPositions="0.7" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane>
+                           <children>
+                              <Pane id="messagePane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane>
+                           <children>
+                              <BorderPane id="sendPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <right>
+                                    <Button id="bSend" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="9000000.0" text="Senden" BorderPane.alignment="CENTER" />
+                                 </right>
+                                 <top>
+                                    <Pane id="messageOptionPane" prefHeight="20.0" BorderPane.alignment="CENTER" />
+                                 </top>
+                                 <center>
+                                    <TextArea id="sendTextArea" BorderPane.alignment="CENTER" />
+                                 </center>
+                              </BorderPane>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+          <AnchorPane>
+               <children>
+                  <SplitPane id="chatChoiceSplit" dividerPositions="0.5" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane>
+                           <children>
+                              <BorderPane id="activeChatsPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <top>
+                                    <HBox id="activeChatsLabelPane" alignment="CENTER" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Label id="activeChatsLabel" text="aktive Chats" />
+                                       </children>
+                                    </HBox>
+                                 </top>
+                                 <center>
+                                    <ListView id="activeChatsList" BorderPane.alignment="CENTER" />
+                                 </center>
+                              </BorderPane>
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane>
+                           <children>
+                              <BorderPane id="userPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <top>
+                                    <HBox id="userLabelPane" alignment="CENTER" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Label id="userLabel" alignment="CENTER" contentDisplay="CENTER" text="Gruppen und User" />
+                                       </children>
+                                    </HBox>
+                                 </top>
+                                 <center>
+                                    <TreeView id="userTree" BorderPane.alignment="CENTER" />
+                                 </center>
+                              </BorderPane>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </center>
+</BorderPane>

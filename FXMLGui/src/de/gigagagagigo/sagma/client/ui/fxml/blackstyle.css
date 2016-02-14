@@ -1,0 +1,102 @@
+
+
+#maincon, .split-pane{
+	-fx-background-color: #000000;
+}
+.label, #menu{
+	-fx-text-fill: white;
+	-fx-background-color: transparent;
+}
+
+#groups, #activechats, #activelist, #grouppane, #grouptree, #grouptree .tree-cell{
+	-fx-background-color: #323232;
+}
+
+.split-pane > .split-pane-divider{
+	-fx-background-color:
+		linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
+        linear-gradient(#020b02, #3a3a3a),
+        linear-gradient(#9d9e9d 0%, #6b6a6b 20%, #343534 80%, #242424 100%),
+        linear-gradient(#8a8a8a 0%, #6b6a6b 20%, #343534 80%, #262626 100%),
+        linear-gradient(#777777 0%, #606060 50%, #505250 51%, #2a2b2a 100%);
+    -fx-background-insets: 0,1,4,5,6;
+   	-fx-background-radius: 9,8,5,4,3;
+}
+
+#menu{
+	-fx-background-color:
+		linear-gradient(#2E1300 0%, #733000 50%, #2E1300 100%);
+	-fx-background-insets:0.0;
+	-fx-background-radius: 9;
+}
+#menu .menu{
+	-fx-background-color: transparent;
+}
+#menu .menu:showing, #menu .menu:hover{
+	-fx-background-color:
+		linear-gradient(#1E1300 0%, #633000 50%, #1E1300 100%);
+}
+#menu .menu .context-menu{
+	-fx-background-color:
+		linear-gradient(#1E1300 0%, #633000 50%, #1E1300 100%);
+}
+#menu .menu .menu-item{
+	-fx-background-color:transparent;
+}
+
+#messageoptions, #activechatslabelpane, #groupslabelpane, #footer{
+	-fx-background-color:
+		linear-gradient(#2E1300 0%, #733000 20%, #2E1300 100%);
+}
+
+#chat{
+	-fx-background-color: black;
+}
+
+#chathistory{
+	-fx-background-color: #323232;
+}
+#chatinput{
+	-fx-background-color:#000000;
+	-fx-text-box-border: red;
+}
+#chatinput .content{
+	-fx-background-color: #666666;
+	-fx-border-width:0,0,0,0;
+}
+
+#chatinput .textarea{
+	-fx-background-color: #777777;
+}
+
+#messageoptions{
+	-fx-max-height: 30px;
+}
+
+#selection{
+	-fx-max-width: 150px;
+	-fx-pref-width: 100px;
+}
+
+#activechats{
+	-fx-background-color: #323232;
+}
+
+
+#sendbutton {
+	-fx-min-width: 90px;
+	-fx-pref-height: Infinity;
+
+  -fx-background-color:
+  	linear-gradient(#121212 0%, #727272 50%, #121212 100%);
+  -fx-border-radius: 5;
+  -fx-font-size: 20px;
+  -fx-text-alignment:center;
+  -fx-fill: #FFFFFF;
+  -fx-alignment: baseline-center ;
+}
+
+#sendbutton:hover {
+	-fx-background-color:
+		linear-gradient(#000000 0%, #565656 50%, #000000 100%);
+}

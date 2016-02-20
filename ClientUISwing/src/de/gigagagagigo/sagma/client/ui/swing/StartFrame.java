@@ -18,8 +18,11 @@ public class StartFrame extends JFrame implements ActionListener {
 	private JTextField server = new JTextField(20);
 	private JTextField username = new JTextField(20);
 	private JButton ok = new JButton("OK");
+	private LogInRequestPacket request;
 
 	public StartFrame() {
+		server.addActionListener(this);
+		username.addActionListener(this);
 		ok.addActionListener(this);
 
 		JLabel serverLabel = new JLabel("Server:");
@@ -60,28 +63,29 @@ public class StartFrame extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		ok.setEnabled(false);
-		SagMaClient client = new SagMaClient();
-		client.setPacketHandler(p -> {
-			if (p instanceof LogInReplyPacket) {
-				LogInReplyPacket reply = (LogInReplyPacket) p;
-				if (reply.success) {
-					SwingUtilities.invokeLater(() -> {
-						setVisible(false);
-						dispose();
-						new ListFrame(client);
-					});
+		if (ok.isEnabled()) {
+			ok.setEnabled(false);
+			SagMaClient client = new SagMaClient();
+			client.setPacketHandler(p -> {
+				if (p instanceof LogInReplyPacket) {
+					LogInReplyPacket reply = (LogInReplyPacket) p;
+					if (reply.success) {
+						SwingUtilities.invokeLater(() -> {
+							dispose();
+							new WindowManager(client, request.username);
+						});
+					} else {
+						SwingUtilities.invokeLater(() -> ok.setEnabled(true));
+					}
 				} else {
 					SwingUtilities.invokeLater(() -> ok.setEnabled(true));
 				}
-			} else {
-				SwingUtilities.invokeLater(() -> ok.setEnabled(true));
-			}
-		});
-		client.start(server.getText());
-		LogInRequestPacket request = new LogInRequestPacket();
-		request.username = username.getText();
-		client.sendPacket(request);
+			});
+			client.start(server.getText());
+			request = new LogInRequestPacket();
+			request.username = username.getText();
+			client.sendPacket(request);
+		}
 	}
 
 }

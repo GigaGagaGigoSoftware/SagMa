@@ -89,7 +89,12 @@ public class ConnectionHandler implements Runnable {
 
 	private void handleUserListRequest(UserListRequestPacket request) throws IOException {
 		UserListReplyPacket reply = new UserListReplyPacket();
-		reply.users = server.getUsers();
+		String[] serverUsers = server.getUsers();
+		reply.users = new String[serverUsers.length - 1];
+		for (int serverIndex = 0, index = 0; serverIndex < serverUsers.length
+			&& index < reply.users.length; serverIndex++)
+			if (!serverUsers[serverIndex].equals(username))
+				reply.users[index++] = serverUsers[serverIndex];
 		out.write(reply);
 	}
 

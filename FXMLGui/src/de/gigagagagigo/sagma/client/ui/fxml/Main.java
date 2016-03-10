@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import controller.ChatController;
-import controller.LogInController;
 import de.gigagagagigo.sagma.client.SagMaClient;
+import de.gigagagagigo.sagma.client.ui.fxml.controller.ChatController;
+import de.gigagagagigo.sagma.client.ui.fxml.controller.LogInController;
 import de.gigagagagigo.sagma.packets.LogInReplyPacket;
 import de.gigagagagigo.sagma.packets.LogInRequestPacket;
 import javafx.application.Application;

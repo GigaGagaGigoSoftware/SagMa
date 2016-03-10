@@ -1,4 +1,4 @@
-package controller;
+package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.packets.LogInReplyPacket;

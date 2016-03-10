@@ -1,7 +1,9 @@
-package controller;
+package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.DefaultListModel;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
@@ -11,6 +13,8 @@ import de.gigagagagigo.sagma.packets.ChatMessagePacket;
 import de.gigagagagigo.sagma.packets.UserListReplyPacket;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 
 public class ChatController {
 
@@ -18,14 +22,17 @@ public class ChatController {
 	private SagMaClient client;
 	private final Map<String, ChatPane> chats = new HashMap();
 
-	//TODO
-		private TestList list;
+	TreeItem<String> tiUsers;
+
+	@FXML
+	private TreeView userTree;
+
 
 	@FXML
 	private void initialize() {
 
-		//TODO
-		list = new TestList(this);
+		// TODO TreeViewListener hinzufügen
+
 	}
 
 	public void setUsername(String username){
@@ -40,13 +47,51 @@ public class ChatController {
 		this.client.setPacketHandler(this::handlePacket);
 	}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	private ChatPane getChatPane(String partner){
+		ChatPane pane = chats.get(partner);
+		if(pane == null){
+			pane = new ChatPane(this, partner);
+			chats.put(partner, pane);
+		}
+		return pane;
+	}
+
+	public void closeChatPane(String partner){
+		chats.remove(partner);
+	}
+
+
+
+
+
+
+	/**
+	 * PacketHandler
+	 */
+
+	/**
+	 *
+	 * @param packet
+	 */
 	private void handlePacket(Packet packet){
 		if(packet instanceof UserListReplyPacket){
 			UserListReplyPacket reply = (UserListReplyPacket) packet;
 			Platform.runLater(()->{
-				if(list != null){
-					list.handleUserListReply(reply);
-				}
+					handleUserListReply(reply);
 			});
 		} else if(packet instanceof ChatMessagePacket){
 			ChatMessagePacket message = (ChatMessagePacket) packet;
@@ -62,20 +107,11 @@ public class ChatController {
 		client.sendPacket(packet);
 	}
 
-	private ChatPane getChatPane(String partner){
-		ChatPane pane = chats.get(partner);
-		if(pane == null){
-			pane = new ChatPane(this, partner);
-			chats.put(partner, pane);
-		}
-		return pane;
-	}
-
-	public void closeChatPane(String partner){
-		chats.remove(partner);
-	}
-
-	public void deleteList(){
-		list = null;
+	private void handleUserListReply(UserListReplyPacket reply){
+		tiUsers = new TreeItem<String> ("Users");
+		tiUsers.setExpanded(true);
+		userTree.setRoot(tiUsers);
+		for(String user : reply.users)
+			tiUsers.getChildren().add(new TreeItem<String>(user));
 	}
 }

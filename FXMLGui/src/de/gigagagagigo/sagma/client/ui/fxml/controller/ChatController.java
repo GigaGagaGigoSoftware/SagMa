@@ -13,27 +13,79 @@ import de.gigagagagigo.sagma.packets.ChatMessagePacket;
 import de.gigagagagigo.sagma.packets.UserListReplyPacket;
 import de.gigagagagigo.sagma.packets.UserListRequestPacket;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 
 public class ChatController {
 
 	private String username;
 	private SagMaClient client;
 	private final Map<String, ChatPane> chats = new HashMap();
+	private final ObservableList<String> activeChats = FXCollections.observableArrayList();
+
 
 	TreeItem<String> tiUsers;
 
 	@FXML
 	private TreeView<String> userTree;
+	@FXML
+	private ListView<String> activeChatsList;
+	@FXML
+	private Pane messagePane;
 
 
 	@FXML
 	private void initialize() {
+		activeChatsList.setItems(activeChats);
 
-		// TODO TreeViewListener hinzufügen
+		userTree.setOnMouseClicked(new EventHandler<MouseEvent>(){
+			@Override
+			public void handle(MouseEvent e){
+				//TODO Edit for groups (leafquery)
+				if(e.getClickCount() == 2 && userTree.getSelectionModel().getSelectedItem() != null && userTree.getSelectionModel().getSelectedItem().isLeaf()){
+					String selected = userTree.getSelectionModel().getSelectedItem().getValue();
 
+					openChatPane(getChatPane(selected), selected);
+				}
+			}
+		});
+
+		activeChatsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>(){
+
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldPartner, String newPartner) {
+				openChatPane(getChatPane(newPartner), newPartner);
+			}
+
+		});
+
+		handlePacket(new UserListReplyPacket());
+
+
+	}
+
+	/**
+	 * TODO Open the Chatpane
+	 *
+	 */
+	private void openChatPane(ChatPane pane, String partner){
+		messagePane = pane;
+		Platform.runLater(new Runnable(){
+			@Override
+			public void run(){
+				activeChatsList.scrollTo(partner);
+				activeChatsList.getSelectionModel().select(partner);
+			}
+		});
 	}
 
 	public void setUsername(String username){
@@ -67,12 +119,14 @@ public class ChatController {
 		if(pane == null){
 			pane = new ChatPane(this, partner);
 			chats.put(partner, pane);
+			activeChats.add(partner);
 		}
 		return pane;
 	}
 
 	public void closeChatPane(String partner){
 		chats.remove(partner);
+		activeChats.remove(partner);
 	}
 
 

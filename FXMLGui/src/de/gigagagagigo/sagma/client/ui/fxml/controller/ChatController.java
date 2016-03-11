@@ -11,6 +11,7 @@ import de.gigagagagigo.sagma.client.ui.fxml.TestList;
 import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packets.ChatMessagePacket;
 import de.gigagagagigo.sagma.packets.UserListReplyPacket;
+import de.gigagagagigo.sagma.packets.UserListRequestPacket;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
@@ -25,7 +26,7 @@ public class ChatController {
 	TreeItem<String> tiUsers;
 
 	@FXML
-	private TreeView userTree;
+	private TreeView<String> userTree;
 
 
 	@FXML
@@ -75,8 +76,14 @@ public class ChatController {
 	}
 
 
+	/**
+	 * TODO
+	 * Update
+	 */
 
-
+	private void updateUserTree(){
+		sendPacket(new UserListRequestPacket());
+	}
 
 
 	/**
@@ -110,8 +117,8 @@ public class ChatController {
 	private void handleUserListReply(UserListReplyPacket reply){
 		tiUsers = new TreeItem<String> ("Users");
 		tiUsers.setExpanded(true);
-		userTree.setRoot(tiUsers);
 		for(String user : reply.users)
 			tiUsers.getChildren().add(new TreeItem<String>(user));
+		userTree.setRoot(tiUsers);
 	}
 }

@@ -7,7 +7,6 @@ import javax.swing.DefaultListModel;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
-import de.gigagagagigo.sagma.client.ui.fxml.TestList;
 import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packets.ChatMessagePacket;
 import de.gigagagagigo.sagma.packets.UserListReplyPacket;

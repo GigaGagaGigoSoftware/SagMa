@@ -1,25 +1,25 @@
 package de.gigagagagigo.sagma.server;
 
 import java.io.IOException;
-import java.net.Socket;
 
 import de.gigagagagigo.sagma.SagMa;
+import de.gigagagagigo.sagma.net.Connection;
 import de.gigagagagigo.sagma.packet.*;
 import de.gigagagagigo.sagma.packets.*;
 
 public class ConnectionHandler implements Runnable {
 
 	private final SagMaServer server;
-	private final Socket socket;
+	private final Connection connection;
 	private final PacketInputStream in;
 	private final PacketOutputStream out;
 	private String username;
 
-	public ConnectionHandler(SagMaServer server, Socket socket) throws IOException {
+	public ConnectionHandler(SagMaServer server, Connection connection) throws IOException {
 		this.server = server;
-		this.socket = socket;
-		this.in = new PacketInputStream(socket.getInputStream());
-		this.out = new PacketOutputStream(socket.getOutputStream());
+		this.connection = connection;
+		this.in = new PacketInputStream(connection.getInputStream());
+		this.out = new PacketOutputStream(connection.getOutputStream());
 	}
 
 	public void start() {
@@ -100,7 +100,7 @@ public class ConnectionHandler implements Runnable {
 
 	private void close() {
 		try {
-			socket.close();
+			connection.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -1,12 +1,13 @@
 package de.gigagagagigo.sagma.client;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import de.gigagagagigo.sagma.SagMa;
+import de.gigagagagigo.sagma.net.Connection;
+import de.gigagagagigo.sagma.net.NetworkFactories;
 import de.gigagagagigo.sagma.packet.Packet;
 
 public class SagMaClient {
@@ -17,12 +18,11 @@ public class SagMaClient {
 	public void start(String server) {
 		new Thread(() -> {
 			try {
-				@SuppressWarnings("resource")
-				// Do not close the socket here, because we are starting the server.
-				// The socket will be closed if one of the io streams created here is closed.
-				Socket socket = new Socket(server, SagMa.PORT);
-				new Thread(new PacketWriter(queue, socket.getOutputStream())).start();
-				new Thread(new PacketReader(socket.getInputStream(), handlerReference)).start();
+				// Do not close the connection here, because we are starting the server.
+				// The connection will be closed if one of the io streams created here is closed.
+				Connection connection = NetworkFactories.get().openConnection(server, SagMa.PORT);
+				new Thread(new PacketWriter(queue, connection.getOutputStream())).start();
+				new Thread(new PacketReader(connection.getInputStream(), handlerReference)).start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -1,21 +1,22 @@
 package de.gigagagagigo.sagma.server;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import de.gigagagagigo.sagma.SagMa;
+import de.gigagagagigo.sagma.net.*;
 
 public class SagMaServer implements Runnable {
 
 	private static final String[] STRING_ARRAY = new String[0];
 
-	private final ServerSocket serverSocket;
+	private final ConnectionPoint connectionPoint;
 	private final ConcurrentMap<String, ConnectionHandler> activeHandlers;
 
 	public SagMaServer() throws IOException {
-		this.serverSocket = new ServerSocket(SagMa.PORT);
+		this.connectionPoint = NetworkFactories.get().openConnectionPoint(SagMa.PORT);
 		this.activeHandlers = new ConcurrentHashMap<>();
 	}
 
@@ -24,15 +25,15 @@ public class SagMaServer implements Runnable {
 	}
 
 	public void stop() throws IOException {
-		serverSocket.close();
+		connectionPoint.close();
 	}
 
 	@Override
 	public void run() {
 		try {
 			while (true) {
-				Socket socket = serverSocket.accept();
-				ConnectionHandler handler = new ConnectionHandler(this, socket);
+				Connection connection = connectionPoint.accept();
+				ConnectionHandler handler = new ConnectionHandler(this, connection);
 				handler.start();
 			}
 		} catch (SocketException e) {

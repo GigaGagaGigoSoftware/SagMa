@@ -30,21 +30,21 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
-		showLogIn();
+//		showLogIn();
+		showChat(null);
 	}
 
 	private void showChat(SagMaClient client) {
-		System.out.println("showChat");
+
 		try {
 
 			FXMLLoader loader = new FXMLLoader();
-			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));
 			BorderPane root = loader.load(getClass().getResource("chat.fxml").openStream());
 			this.primaryStage.setTitle("SagMa");
 			Scene scene = new Scene(root, 550, 550);
 			this.primaryStage.setMinHeight(550);
 			this.primaryStage.setMinWidth(350);
-			scene.getStylesheets().add(getClass().getResource("blackstyle.css").toExternalForm());
+//			scene.getStylesheets().add(getClass().getResource("blackstyle.css").toExternalForm());
 			this.primaryStage.setScene(scene);
 
 			ChatController controller = loader.getController();
@@ -52,7 +52,7 @@ public class Main extends Application {
 
 
 			controller.setClient(client);
-			controller.setPacketHandler();
+//			controller.setPacketHandler();
 
 			this.primaryStage.show();
 		} catch (Exception e) {
@@ -61,6 +61,7 @@ public class Main extends Application {
 	}
 
 	private boolean showLogIn() {
+
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			BorderPane root = loader.load(getClass().getResource("LogIn.fxml").openStream());
@@ -74,7 +75,7 @@ public class Main extends Application {
 			LogInController controller = loader.getController();
 			controller.setLoginStage(loginStage);
 
-			loginStage.show();
+			loginStage.showAndWait();
 
 			if(controller.isOkClicked()){
 
@@ -93,24 +94,20 @@ public class Main extends Application {
 	}
 
 	private void login(LogInController controller){
+
 		SagMaClient client = new SagMaClient();
 		client.setPacketHandler(p -> {
 			if (p instanceof LogInReplyPacket) {
-				System.out.println("Test1");
 				LogInReplyPacket reply = (LogInReplyPacket) p;
 				if (reply.success) {
-					System.out.println("Test2");
 					Platform.runLater(()->{
-						System.out.println("LogInReply1");
 						controller.closeWindow();
 						showChat(client);
 					});
 				} else{
-					System.out.println("LogInError1");
 					Platform.runLater(()-> controller.changeButtonAccess());
 				}
 			} else{
-				System.out.println("LogInError2");
 				Platform.runLater(()-> controller.changeButtonAccess());
 			}
 		});

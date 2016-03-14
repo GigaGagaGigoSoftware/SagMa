@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+
+<BorderPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
+	minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0"
+	prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.gigagagagigo.sagma.client.ui.fxml.controller.LogInController">
+	<center>
+		<VBox>
+			<HBox>
+				<Label fx:id="serverLabel" text="Server:" />
+				<TextField fx:id="tfServer" />
+			</HBox>
+			<HBox>
+				<Label fx:id="usernameLabel" text="Username:" />
+				<TextField fx:id="tfUsername" />
+			</HBox>
+			<HBox>
+				<Button fx:id="okButton" onAction="#handleOK" text="OK" />
+				<Button onAction="#handleCancel" text="Cancel" />
+			</HBox>
+		</VBox>
+	</center>
+</BorderPane>
+
+

@@ -7,7 +7,7 @@ public class SocketConnection implements Connection {
 
 	private final Socket socket;
 
-	public SocketConnection(Socket socket) {
+	SocketConnection(Socket socket) {
 		this.socket = socket;
 	}
 

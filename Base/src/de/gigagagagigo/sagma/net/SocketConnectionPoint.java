@@ -7,7 +7,7 @@ public class SocketConnectionPoint implements ConnectionPoint {
 
 	private final ServerSocket server;
 
-	public SocketConnectionPoint(int port) throws IOException {
+	SocketConnectionPoint(int port) throws IOException {
 		server = new ServerSocket(port);
 	}
 

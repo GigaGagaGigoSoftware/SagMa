@@ -1,7 +1,6 @@
 package de.gigagagagigo.sagma.server;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -36,7 +35,7 @@ public class SagMaServer implements Runnable {
 				ConnectionHandler handler = new ConnectionHandler(this, connection);
 				handler.start();
 			}
-		} catch (SocketException e) {
+		} catch (ConnectionPointException e) {
 			// expected
 		} catch (IOException e) {
 			e.printStackTrace();

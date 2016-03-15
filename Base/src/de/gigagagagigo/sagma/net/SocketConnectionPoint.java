@@ -2,6 +2,7 @@ package de.gigagagagigo.sagma.net;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.SocketException;
 
 public class SocketConnectionPoint implements ConnectionPoint {
 
@@ -13,7 +14,11 @@ public class SocketConnectionPoint implements ConnectionPoint {
 
 	@Override
 	public Connection accept() throws IOException {
-		return new SocketConnection(server.accept());
+		try {
+			return new SocketConnection(server.accept());
+		} catch (SocketException e) {
+			throw new ConnectionPointException(e);
+		}
 	}
 
 	@Override

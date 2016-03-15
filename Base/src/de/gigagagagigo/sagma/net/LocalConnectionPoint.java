@@ -48,7 +48,7 @@ public class LocalConnectionPoint implements ConnectionPoint {
 				return c;
 			connections.add(CLOSED);
 		} catch (InterruptedException e) {}
-		throw new IOException("ConnectionPoint is closed.");
+		throw new ConnectionPointException("ConnectionPoint is closed.");
 	}
 
 	@Override

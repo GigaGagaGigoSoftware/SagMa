@@ -33,19 +33,20 @@ public class Main extends Application {
 		showLogIn();
 	}
 
-	private void showChat(SagMaClient client) {
+	public static void showChat(SagMaClient client, String username) {
 		System.out.println("showChat");
 		try {
 
+			Stage primaryStage = new Stage();
 			FXMLLoader loader = new FXMLLoader();
 			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));
-			BorderPane root = loader.load(getClass().getResource("chat.fxml").openStream());
-			this.primaryStage.setTitle("SagMa");
+			BorderPane root = loader.load(Main.class.getResource("chat.fxml").openStream());
+			primaryStage.setTitle("SagMa");
 			Scene scene = new Scene(root, 550, 550);
-			this.primaryStage.setMinHeight(550);
-			this.primaryStage.setMinWidth(350);
-			scene.getStylesheets().add(getClass().getResource("blackstyle.css").toExternalForm());
-			this.primaryStage.setScene(scene);
+			primaryStage.setMinHeight(550);
+			primaryStage.setMinWidth(350);
+			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
+			primaryStage.setScene(scene);
 
 			ChatController controller = loader.getController();
 			controller.setUsername(username);
@@ -54,7 +55,7 @@ public class Main extends Application {
 			controller.setClient(client);
 			controller.setPacketHandler();
 
-			this.primaryStage.show();
+			primaryStage.show();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -74,16 +75,8 @@ public class Main extends Application {
 			LogInController controller = loader.getController();
 			controller.setLoginStage(loginStage);
 
-			loginStage.show();
+			loginStage.showAndWait();
 
-			if(controller.isOkClicked()){
-
-				controller.changeButtonAccess();
-				this.server = controller.getServer();
-				this.username = controller.getUsername();
-
-				login(controller);
-			}
 			return controller.isOkClicked();
 
 		} catch (Exception e) {
@@ -92,32 +85,4 @@ public class Main extends Application {
 		}
 	}
 
-	private void login(LogInController controller){
-		SagMaClient client = new SagMaClient();
-		client.setPacketHandler(p -> {
-			if (p instanceof LogInReplyPacket) {
-				System.out.println("Test1");
-				LogInReplyPacket reply = (LogInReplyPacket) p;
-				if (reply.success) {
-					System.out.println("Test2");
-					Platform.runLater(()->{
-						System.out.println("LogInReply1");
-						controller.closeWindow();
-						showChat(client);
-					});
-				} else{
-					System.out.println("LogInError1");
-					Platform.runLater(()-> controller.changeButtonAccess());
-				}
-			} else{
-				System.out.println("LogInError2");
-				Platform.runLater(()-> controller.changeButtonAccess());
-			}
-		});
-		client.start(server);
-		request = new LogInRequestPacket();
-		request.username = username;
-		client.sendPacket(request);
-
-	}
 }

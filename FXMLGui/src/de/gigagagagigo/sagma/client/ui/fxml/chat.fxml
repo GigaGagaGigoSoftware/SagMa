@@ -51,7 +51,7 @@
                     <items>
                       <AnchorPane>
                            <children>
-                              <Pane id="messagePane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <Pane fx:id="messagePane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                       <AnchorPane>
@@ -88,7 +88,7 @@
                                     </HBox>
                                  </top>
                                  <center>
-                                    <ListView id="activeChatsList" BorderPane.alignment="CENTER" />
+                                    <ListView fx:id="activeChatsList" BorderPane.alignment="CENTER" />
                                  </center>
                               </BorderPane>
                            </children>
@@ -104,7 +104,7 @@
                                     </HBox>
                                  </top>
                                  <center>
-        	                            <TreeView id="userTree" BorderPane.alignment="CENTER" />
+        	                            <TreeView fx:id="userTree" BorderPane.alignment="CENTER" />
                                  </center>
                               </BorderPane>
                            </children>

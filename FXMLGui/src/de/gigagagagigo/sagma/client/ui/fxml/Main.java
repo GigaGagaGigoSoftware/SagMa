@@ -40,7 +40,7 @@ public class Main extends Application {
 			Stage primaryStage = new Stage();
 			FXMLLoader loader = new FXMLLoader();
 //			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));
-			BorderPane root = FXMLLoader.load(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/chat.fxml"));
+			BorderPane root = loader.load(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/chat.fxml").openStream());
 			primaryStage.setTitle("SagMa");
 			Scene scene = new Scene(root, 550, 550);
 			primaryStage.setMinHeight(550);
@@ -49,9 +49,8 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 
 			ChatController controller = loader.getController();
-			controller.setUsername(username);
 
-
+			System.out.println(controller);
 			controller.setClient(client);
 			controller.setPacketHandler();
 

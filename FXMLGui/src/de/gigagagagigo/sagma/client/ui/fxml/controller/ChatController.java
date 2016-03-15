@@ -170,8 +170,11 @@ public class ChatController {
 	private void handleUserListReply(UserListReplyPacket reply){
 		tiUsers = new TreeItem<String> ("Users");
 		tiUsers.setExpanded(true);
-		for(String user : reply.users)
-			tiUsers.getChildren().add(new TreeItem<String>(user));
+		if(reply.users != null){
+			for(String user : reply.users){
+				tiUsers.getChildren().add(new TreeItem<String>(user));
+			}
+		}
 		userTree.setRoot(tiUsers);
 	}
 }

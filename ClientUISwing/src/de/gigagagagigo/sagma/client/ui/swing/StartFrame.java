@@ -75,7 +75,14 @@ public class StartFrame extends JFrame implements ActionListener {
 							new WindowManager(client, request.username);
 						});
 					} else {
-						SwingUtilities.invokeLater(() -> ok.setEnabled(true));
+						SwingUtilities.invokeLater(() -> {
+							JOptionPane.showMessageDialog(
+								this,
+								"Der Benutzername wird bereits verwendet.",
+								"Fehler!",
+								JOptionPane.ERROR_MESSAGE);
+							ok.setEnabled(true);
+						});
 					}
 				} else {
 					SwingUtilities.invokeLater(() -> ok.setEnabled(true));

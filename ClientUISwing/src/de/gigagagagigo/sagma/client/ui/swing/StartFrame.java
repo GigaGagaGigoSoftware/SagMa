@@ -56,7 +56,7 @@ public class StartFrame extends JFrame implements ActionListener {
 		pack();
 		setMinimumSize(getSize());
 		setLocationRelativeTo(null);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setTitle("SagMa");
 		setVisible(true);
 	}

@@ -1,6 +1,10 @@
 package de.gigagagagigo.sagma.server;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import de.gigagagagigo.sagma.SagMa;
 import de.gigagagagigo.sagma.net.Connection;
@@ -13,6 +17,8 @@ public class ConnectionHandler implements Runnable {
 	private final Connection connection;
 	private final PacketInputStream in;
 	private final PacketOutputStream out;
+	private final BlockingQueue<Packet> queue;
+	private final Lock closeLock = new ReentrantLock();
 	private String username;
 
 	public ConnectionHandler(SagMaServer server, Connection connection) throws IOException {
@@ -20,21 +26,11 @@ public class ConnectionHandler implements Runnable {
 		this.connection = connection;
 		this.in = new PacketInputStream(connection.getInputStream());
 		this.out = new PacketOutputStream(connection.getOutputStream());
+		this.queue = new LinkedBlockingQueue<>();
 	}
 
 	public void start() {
 		new Thread(this).start();
-	}
-
-	public void sendMessage(String username, String message) {
-		try {
-			ChatMessagePacket chatMessage = new ChatMessagePacket();
-			chatMessage.username = username;
-			chatMessage.message = message;
-			out.write(chatMessage);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -46,6 +42,7 @@ public class ConnectionHandler implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
+			server.unregister(username);
 			close();
 		}
 	}
@@ -62,11 +59,13 @@ public class ConnectionHandler implements Runnable {
 
 	private boolean logIn() throws IOException {
 		LogInRequestPacket request = in.read(LogInRequestPacket.class);
-		this.username = request.username;
-		boolean success = server.register(this.username, this);
+		boolean success = server.register(request.username, this);
+		if (success)
+			this.username = request.username;
 		LogInReplyPacket reply = new LogInReplyPacket();
 		reply.success = success;
 		out.write(reply);
+		new Thread(new Writer()).start();
 		return success;
 	}
 
@@ -77,8 +76,13 @@ public class ConnectionHandler implements Runnable {
 				handleChatMessage((ChatMessagePacket) packet);
 			} else if (packet instanceof UserListRequestPacket) {
 				handleUserListRequest((UserListRequestPacket) packet);
+			} else if (packet instanceof DisconnectPacket) {
+				server.unregister(username);
+				username = null;
+				queue.add(new DisconnectPacket());
+				break;
 			} else {
-				return;
+				break;
 			}
 		}
 	}
@@ -95,14 +99,42 @@ public class ConnectionHandler implements Runnable {
 			&& index < reply.users.length; serverIndex++)
 			if (!serverUsers[serverIndex].equals(username))
 				reply.users[index++] = serverUsers[serverIndex];
-		out.write(reply);
+		queue.add(reply);
 	}
 
 	private void close() {
+		closeLock.lock();
 		try {
 			connection.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			closeLock.unlock();
+		}
+	}
+
+	public void sendMessage(String username, String message) {
+		ChatMessagePacket packet = new ChatMessagePacket();
+		packet.username = username;
+		packet.message = message;
+		queue.add(packet);
+	}
+
+	private class Writer implements Runnable {
+		@Override
+		public void run() {
+			closeLock.lock();
+			try {
+				Packet packet;
+				do {
+					packet = queue.take();
+					out.write(packet);
+				} while (!(packet instanceof DisconnectPacket));
+			} catch (InterruptedException ignored) {} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				closeLock.unlock();
+			}
 		}
 	}
 

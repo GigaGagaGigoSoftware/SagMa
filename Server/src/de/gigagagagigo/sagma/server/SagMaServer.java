@@ -46,14 +46,20 @@ public class SagMaServer implements Runnable {
 		return activeHandlers.putIfAbsent(username, handler) == null;
 	}
 
+	public void unregister(String username) {
+		if (username != null)
+			activeHandlers.remove(username);
+	}
+
 	public String[] getUsers() {
 		return activeHandlers.keySet().toArray(STRING_ARRAY);
 	}
 
 	public void sendMessage(String from, String to, String message) {
-		ConnectionHandler handler = activeHandlers.get(to);
-		if (handler != null)
+		activeHandlers.computeIfPresent(to, (key, handler) -> {
 			handler.sendMessage(from, message);
+			return handler;
+		});
 	}
 
 }

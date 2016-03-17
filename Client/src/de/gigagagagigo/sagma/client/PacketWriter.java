@@ -8,6 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import de.gigagagagigo.sagma.SagMa;
 import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packet.PacketOutputStream;
+import de.gigagagagigo.sagma.packets.DisconnectPacket;
 import de.gigagagagigo.sagma.packets.VersionCheckRequestPacket;
 
 class PacketWriter implements Runnable {
@@ -24,18 +25,15 @@ class PacketWriter implements Runnable {
 	public void run() {
 		try {
 			sendVersionCheckRequest();
-			while (true)
-				out.write(queue.take());
+			Packet packet;
+			do {
+				packet = queue.take();
+				out.write(packet);
+			} while (!(packet instanceof DisconnectPacket));
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 

@@ -7,8 +7,7 @@ import javax.swing.SwingUtilities;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.packet.Packet;
-import de.gigagagagigo.sagma.packets.ChatMessagePacket;
-import de.gigagagagigo.sagma.packets.UserListReplyPacket;
+import de.gigagagagigo.sagma.packets.*;
 
 public class WindowManager {
 
@@ -63,10 +62,18 @@ public class WindowManager {
 
 	public void closeChatFrame(String partner) {
 		chats.remove(partner);
+		checkClose();
 	}
 
 	public void closeListFrame() {
 		list = null;
+		checkClose();
+	}
+
+	private void checkClose() {
+		if (list == null && chats.isEmpty()) {
+			client.sendPacket(new DisconnectPacket());
+		}
 	}
 
 }

@@ -13,6 +13,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.TreeItem?>
 
 
 <BorderPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.gigagagagigo.sagma.client.ui.fxml.controller.ChatController">
@@ -104,7 +105,9 @@
                                     </HBox>
                                  </top>
                                  <center>
-        	                            <TreeView fx:id="userTree" BorderPane.alignment="CENTER" />
+        	                            <TreeView fx:id="userTree" BorderPane.alignment="CENTER" >
+        	                            	<TreeItem fx:id="userTreeItem" />
+        	                            </TreeView>
                                  </center>
                               </BorderPane>
                            </children>

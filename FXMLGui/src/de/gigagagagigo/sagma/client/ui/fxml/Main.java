@@ -38,21 +38,25 @@ public class Main extends Application {
 		try {
 
 			Stage primaryStage = new Stage();
+			primaryStage.setTitle("SagMa");
+			primaryStage.setMinHeight(550);
+			primaryStage.setMinWidth(350);
+
+//			ChatController chatController = new ChatController(client);
+
+
 			FXMLLoader loader = new FXMLLoader();
 //			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));
 			BorderPane root = loader.load(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/chat.fxml").openStream());
-			primaryStage.setTitle("SagMa");
-			Scene scene = new Scene(root, 550, 550);
-			primaryStage.setMinHeight(550);
-			primaryStage.setMinWidth(350);
-			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
-			primaryStage.setScene(scene);
-
+//			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
 			ChatController controller = loader.getController();
-
-			System.out.println(controller);
 			controller.setClient(client);
 			controller.setPacketHandler();
+			loader.setController(controller);
+			Scene scene = new Scene(root, 550, 550);
+			primaryStage.setScene(scene);
+
+
 
 			primaryStage.show();
 		} catch (Exception e) {

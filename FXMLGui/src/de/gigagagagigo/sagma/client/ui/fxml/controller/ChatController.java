@@ -3,7 +3,6 @@ package de.gigagagagigo.sagma.client.ui.fxml.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.DefaultListModel;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
@@ -32,7 +31,7 @@ public class ChatController {
 
 	private String username;
 	private SagMaClient client;
-	private final Map<String, ChatPane> chats = new HashMap();
+	private final Map<String, ChatPane> chats = new HashMap<String, ChatPane>();
 	private final ObservableList<String> activeChats = FXCollections.observableArrayList();
 	private final ObservableList<ActiveChatCell> activeChatsCells = FXCollections.observableArrayList();
 
@@ -47,11 +46,12 @@ public class ChatController {
 	@FXML
 	private Pane messagePane;
 
-	// public ChatController(SagMaClient client) {
-	// System.out.println("Ednlich");
-	// this.client = client;
-	// this.client.setPacketHandler(this::handlePacket);
-	// }
+//	 public ChatController(SagMaClient client) {
+//	 System.out.println("Endlich");
+//	 this.client = client;
+//	 this.client.setPacketHandler(this::handlePacket);
+//	 handlePacket(new UserListReplyPacket());
+//	 }
 
 	@FXML
 	private void initialize() {
@@ -111,6 +111,7 @@ public class ChatController {
 
 	public void setPacketHandler() {
 		this.client.setPacketHandler(this::handlePacket);
+		handlePacket(new UserListReplyPacket());
 	}
 
 	private ChatPane getChatPane(String partner) {
@@ -134,6 +135,16 @@ public class ChatController {
 	public void closeChatPane(String partner) {
 		chats.remove(partner);
 		activeChats.remove(partner);
+		activeChatsCells.remove(getActiveChatCell(partner));
+	}
+
+	private Object getActiveChatCell(String partner) {
+		for(ActiveChatCell cell : activeChatsCells){
+			if(cell.getPartner().equals(partner)){
+				return cell;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -175,7 +186,7 @@ public class ChatController {
 	private void handleUserListReply(UserListReplyPacket reply) {
 		// tiUsers = new TreeItem<String> ("Users");
 		// tiUsers.setExpanded(true);
-
+		userTreeItem.getChildren().removeAll(userTreeItem.getChildren());
 		userTreeItem.setExpanded(true);
 		if (reply.users != null) {
 			for (String user : reply.users) {
@@ -201,6 +212,10 @@ public class ChatController {
 			button.setText("X");
 
 			this.getChildren().addAll(label, button);
+		}
+
+		public Object getPartner() {
+			return this.partner;
 		}
 	}
 }

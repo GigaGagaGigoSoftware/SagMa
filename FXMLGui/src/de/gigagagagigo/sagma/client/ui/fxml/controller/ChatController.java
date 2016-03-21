@@ -1,8 +1,9 @@
 package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.ResourceBundle;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
@@ -46,12 +47,10 @@ public class ChatController {
 	@FXML
 	private Pane messagePane;
 
-//	 public ChatController(SagMaClient client) {
-//	 System.out.println("Endlich");
-//	 this.client = client;
-//	 this.client.setPacketHandler(this::handlePacket);
-//	 handlePacket(new UserListReplyPacket());
-//	 }
+	public ChatController(SagMaClient client) {
+		this.client = client;
+		this.client.setPacketHandler(this::handlePacket);
+	}
 
 	@FXML
 	private void initialize() {
@@ -82,7 +81,7 @@ public class ChatController {
 
 		});
 
-		handlePacket(new UserListReplyPacket());
+		sendPacket(new UserListRequestPacket());
 
 	}
 
@@ -99,19 +98,6 @@ public class ChatController {
 				activeChatsList.getSelectionModel().select(partner);
 			}
 		});
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public void setClient(SagMaClient client) {
-		this.client = client;
-	}
-
-	public void setPacketHandler() {
-		this.client.setPacketHandler(this::handlePacket);
-		handlePacket(new UserListReplyPacket());
 	}
 
 	private ChatPane getChatPane(String partner) {
@@ -139,8 +125,8 @@ public class ChatController {
 	}
 
 	private Object getActiveChatCell(String partner) {
-		for(ActiveChatCell cell : activeChatsCells){
-			if(cell.getPartner().equals(partner)){
+		for (ActiveChatCell cell : activeChatsCells) {
+			if (cell.getPartner().equals(partner)) {
 				return cell;
 			}
 		}
@@ -184,8 +170,6 @@ public class ChatController {
 	}
 
 	private void handleUserListReply(UserListReplyPacket reply) {
-		// tiUsers = new TreeItem<String> ("Users");
-		// tiUsers.setExpanded(true);
 		userTreeItem.getChildren().removeAll(userTreeItem.getChildren());
 		userTreeItem.setExpanded(true);
 		if (reply.users != null) {
@@ -195,8 +179,13 @@ public class ChatController {
 		}
 		userTreeItem.getChildren().add(new TreeItem<String>("Test1"));
 		userTree.setRoot(userTreeItem);
+
 	}
 
+	/**
+	 * ListItem with button for delete
+	 *
+	 */
 	public static class ActiveChatCell extends HBox {
 		Label label = new Label();
 		Button button;

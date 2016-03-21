@@ -16,7 +16,10 @@
 <?import javafx.scene.control.TreeItem?>
 
 
+<!--
 <BorderPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.gigagagagigo.sagma.client.ui.fxml.controller.ChatController">
+-->
+<BorderPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <MenuBar id="menuBar" BorderPane.alignment="CENTER">
         <menus>

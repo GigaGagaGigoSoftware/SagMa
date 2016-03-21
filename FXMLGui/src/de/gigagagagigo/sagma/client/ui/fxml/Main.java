@@ -34,7 +34,6 @@ public class Main extends Application {
 	}
 
 	public static void showChat(SagMaClient client, String username) {
-		System.out.println("showChat");
 		try {
 
 			Stage primaryStage = new Stage();
@@ -42,21 +41,14 @@ public class Main extends Application {
 			primaryStage.setMinHeight(550);
 			primaryStage.setMinWidth(350);
 
-//			ChatController chatController = new ChatController(client);
-
-
-			FXMLLoader loader = new FXMLLoader();
-//			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));
-			BorderPane root = loader.load(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/chat.fxml").openStream());
-//			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
-			ChatController controller = loader.getController();
-			controller.setClient(client);
-			controller.setPacketHandler();
+			ChatController controller = new ChatController(client);
+			FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/chat.fxml"));
 			loader.setController(controller);
+//			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));
+//			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
+			BorderPane root = loader.load();
 			Scene scene = new Scene(root, 550, 550);
 			primaryStage.setScene(scene);
-
-
 
 			primaryStage.show();
 		} catch (Exception e) {

@@ -43,7 +43,7 @@ public class ChatController {
 	@FXML
 	private TreeItem<String> userTreeItem;
 	@FXML
-	private ListView<String> activeChatsList;
+	private ListView<ActiveChatCell> activeChatsList;
 	@FXML
 	private Pane messagePane;
 
@@ -54,7 +54,7 @@ public class ChatController {
 
 	@FXML
 	private void initialize() {
-		activeChatsList.setItems(activeChats);
+		activeChatsList.setItems(activeChatsCells);
 		userTreeItem.setValue("Users");
 
 		userTree.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -70,12 +70,12 @@ public class ChatController {
 			}
 		});
 
-		activeChatsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+		activeChatsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ActiveChatCell>() {
 
 			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldPartner, String newPartner) {
+			public void changed(ObservableValue<? extends ActiveChatCell> observable, ActiveChatCell oldPartner, ActiveChatCell newPartner) {
 				if (!activeChats.isEmpty()) {
-					openChatPane(getChatPane(newPartner), newPartner);
+					openChatPane(getChatPane(newPartner.getPartner()), newPartner.getPartner());
 				}
 			}
 
@@ -94,8 +94,8 @@ public class ChatController {
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
-				activeChatsList.scrollTo(partner);
-				activeChatsList.getSelectionModel().select(partner);
+				activeChatsList.scrollTo(getActiveChatCell(partner));
+				activeChatsList.getSelectionModel().select(getActiveChatCell(partner));
 			}
 		});
 	}
@@ -124,7 +124,7 @@ public class ChatController {
 		activeChatsCells.remove(getActiveChatCell(partner));
 	}
 
-	private Object getActiveChatCell(String partner) {
+	private ActiveChatCell getActiveChatCell(String partner) {
 		for (ActiveChatCell cell : activeChatsCells) {
 			if (cell.getPartner().equals(partner)) {
 				return cell;
@@ -158,8 +158,6 @@ public class ChatController {
 		} else if (packet instanceof ChatMessagePacket) {
 			ChatMessagePacket message = (ChatMessagePacket) packet;
 			Platform.runLater(() -> {
-
-				// TODO
 				getChatPane(message.username).handleChatMessage(message);
 			});
 		}
@@ -203,8 +201,12 @@ public class ChatController {
 			this.getChildren().addAll(label, button);
 		}
 
-		public Object getPartner() {
+		public String getPartner() {
 			return this.partner;
+		}
+
+		public Button getButton(){
+			return button;
 		}
 	}
 }

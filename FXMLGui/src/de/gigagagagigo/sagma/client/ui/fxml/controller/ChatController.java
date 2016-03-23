@@ -21,9 +21,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -45,11 +51,18 @@ public class ChatController {
 	@FXML
 	private ListView<ActiveChatCell> activeChatsList;
 	@FXML
-	private Pane messagePane;
+	private BorderPane messagePane;
+	@FXML
+	private Button bSend;
+	@FXML
+	private TextArea sendTextArea;
+	@FXML
+	private AnchorPane messageAnchorPane;
 
-	public ChatController(SagMaClient client) {
+	public ChatController(SagMaClient client, String username) {
 		this.client = client;
 		this.client.setPacketHandler(this::handlePacket);
+		this.username = username;
 	}
 
 	@FXML
@@ -57,32 +70,35 @@ public class ChatController {
 		activeChatsList.setItems(activeChatsCells);
 		userTreeItem.setValue("Users");
 
-		userTree.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent e) {
-				// TODO Edit for groups (leafquery)
-				if (e.getClickCount() == 2 && userTree.getSelectionModel().getSelectedItem().getValue() != null
-						&& userTree.getSelectionModel().getSelectedItem().isLeaf()) {
-					String selected = userTree.getSelectionModel().getSelectedItem().getValue();
+		userTree.setOnMouseClicked((e) -> {
+			if (e.getClickCount() == 2 && userTree.getSelectionModel().getSelectedItem().getValue() != null
+					&& userTree.getSelectionModel().getSelectedItem().isLeaf()) {
+				String selected = userTree.getSelectionModel().getSelectedItem().getValue();
 
-					openChatPane(getChatPane(selected), selected);
-				}
+				openChatPane(getChatPane(selected), selected);
 			}
 		});
 
 		activeChatsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ActiveChatCell>() {
-
 			@Override
-			public void changed(ObservableValue<? extends ActiveChatCell> observable, ActiveChatCell oldPartner, ActiveChatCell newPartner) {
+			public void changed(ObservableValue<? extends ActiveChatCell> observable, ActiveChatCell oldPartner,
+					ActiveChatCell newPartner) {
 				if (!activeChats.isEmpty()) {
 					openChatPane(getChatPane(newPartner.getPartner()), newPartner.getPartner());
 				}
 			}
+		});
 
+		bSend.setOnAction((e) -> sendMessage());
+		sendTextArea.setOnKeyReleased((e) -> {
+			if (e.getCode().equals(KeyCode.ENTER) && e.isShiftDown()) {
+				sendTextArea.appendText("\n");
+			} else if (e.getCode().equals(KeyCode.ENTER)) {
+				sendMessage();
+			}
 		});
 
 		sendPacket(new UserListRequestPacket());
-
 	}
 
 	/**
@@ -90,7 +106,10 @@ public class ChatController {
 	 *
 	 */
 	private void openChatPane(ChatPane pane, String partner) {
-		messagePane = pane;
+//		messagePane = pane;
+//		messagePane.getChildren().clear();
+		messageAnchorPane.getChildren().clear();
+		messageAnchorPane.getChildren().add(pane);
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -101,9 +120,12 @@ public class ChatController {
 	}
 
 	private ChatPane getChatPane(String partner) {
+//		messagePane.setStyle("-fx-background-color:red");
+		messageAnchorPane.setStyle(".fx.background-color: green");
 		ChatPane pane = chats.get(partner);
 		if (pane == null) {
-			pane = new ChatPane(this, partner);
+			pane = new ChatPane(partner, username);
+			pane.getStyleClass().add("chatPane");
 			chats.put(partner, pane);
 			activeChats.add(partner);
 
@@ -131,6 +153,27 @@ public class ChatController {
 			}
 		}
 		return null;
+	}
+
+	private void sendMessage() {
+		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
+			sendTextArea.setStyle(" -fx-border-color: blue;");
+			String partner = activeChatsList.getSelectionModel().getSelectedItem().getPartner();
+
+			String text = sendTextArea.getText();
+			sendTextArea.setText("");
+
+			if (!text.trim().equals("")) {
+				ChatMessagePacket message = new ChatMessagePacket();
+				message.username = partner;
+				message.message = text;
+				sendPacket(message);
+
+				getChatPane(partner).appendOwnMessage(text);
+			}
+		} else {
+			sendTextArea.setStyle(" -fx-border-color: red;");
+		}
 	}
 
 	/**
@@ -205,7 +248,7 @@ public class ChatController {
 			return this.partner;
 		}
 
-		public Button getButton(){
+		public Button getButton() {
 			return button;
 		}
 	}

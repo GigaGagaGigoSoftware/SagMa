@@ -53,22 +53,22 @@
                <children>
                   <SplitPane id="messageSplit" dividerPositions="0.7" orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                      <AnchorPane>
+                      <AnchorPane fx:id="messageAnchorPane">
                            <children>
-                              <Pane fx:id="messagePane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <BorderPane fx:id="messagePane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                       <AnchorPane>
                            <children>
                               <BorderPane id="sendPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <right>
-                                    <Button id="bSend" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="9000000.0" text="Senden" BorderPane.alignment="CENTER" />
+                                    <Button fx:id="bSend" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="9000000.0" text="Senden" BorderPane.alignment="CENTER" />
                                  </right>
                                  <top>
                                     <Pane id="messageOptionPane" prefHeight="20.0" BorderPane.alignment="CENTER" />
                                  </top>
                                  <center>
-                                    <TextArea id="sendTextArea" BorderPane.alignment="CENTER" />
+                                    <TextArea fx:id="sendTextArea" BorderPane.alignment="CENTER" />
                                  </center>
                               </BorderPane>
                            </children>

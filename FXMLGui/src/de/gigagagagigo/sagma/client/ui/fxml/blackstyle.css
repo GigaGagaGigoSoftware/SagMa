@@ -84,6 +84,20 @@
 	-fx-max-height: 30px;
 }
 
+.messagePane{
+	-fx-max-height: 50px;
+}
+.ownMessagePane{
+
+}
+.partnerMessagePane{
+
+}
+
+.chatPane{
+
+}
+
 
 #bSend {
 	-fx-min-width: 90px;

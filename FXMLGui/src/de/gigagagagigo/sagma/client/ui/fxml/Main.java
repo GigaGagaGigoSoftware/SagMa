@@ -41,7 +41,7 @@ public class Main extends Application {
 			primaryStage.setMinHeight(550);
 			primaryStage.setMinWidth(350);
 
-			ChatController controller = new ChatController(client);
+			ChatController controller = new ChatController(client, username);
 			FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/chat.fxml"));
 			loader.setController(controller);
 //			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));

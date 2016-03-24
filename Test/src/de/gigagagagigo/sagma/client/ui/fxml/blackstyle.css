@@ -1,26 +1,13 @@
-
-
 #mainPane, .split-pane{
-	-fx-background-color: #000000;
-}
-.label, #menuBar{
-	-fx-text-fill: white;
-	-fx-background-color: transparent;
+	-fx-background-color: #000;
 }
 
-#userPane, #activeChatsPane{
-	-fx-background-color: #323232;
-}
 
-#activeChatsList, #userTree, .tree-cell{
-	-fx-background-color: #323232;
-}
-
-#activeChatsLabelPane, #userLabelPane{
+#activeChatsLabelPane, #userLabelPane, #menuBar, #messageOptionPane{
 	-fx-background-color:
 		linear-gradient(#2E1300 0%, #733000 50%, #2E1300 100%);
 	-fx-background-insets:0.0;
-	-fx-background-radius: 9;
+	-fx-background-radius: 0 0 8 8;
 }
 
 .split-pane > .split-pane-divider{
@@ -34,56 +21,47 @@
    	-fx-background-radius: 9,8,5,4,3;
 }
 
-#menuBar{
-	-fx-background-color:
-		linear-gradient(#2E1300 0%, #733000 50%, #2E1300 100%);
-	-fx-background-insets:0.0;
-	-fx-background-radius: 9;
-}
-#menuBar .menu{
-	-fx-background-color: transparent;
-}
-#menuBar .menu:showing, #menuBar .menu:hover{
-	-fx-background-color:
-		linear-gradient(#1E1300 0%, #633000 50%, #1E1300 100%);
-}
-#menuBar .menu .context-menu{
-	-fx-background-color:
-		linear-gradient(#1E1300 0%, #633000 50%, #1E1300 100%);
-}
-#menuBar .menu .menu-item{
-	-fx-background-color:transparent;
+/*menu */
+.label, #menuBar{
+	-fx-text-fill: white;
 }
 
-#messageoptions, #activechatslabelpane, #groupslabelpane, #footer{
-	-fx-background-color:
-		linear-gradient(#2E1300 0%, #733000 20%, #2E1300 100%);
-}
-
-#messageSplit, #chatChoiceSplit{
-	-fx-background-color: black;
-}
+/*Messageregion */
 
 #messagePane{
 	-fx-background-color: #323232;
 }
-#sendPane{
-	-fx-background-color:#000000;
-	-fx-text-box-border: red;
+
+.ownMessagePane, .partnerMessagePane{
+	-fx-background-radius: 8;
+	-fx-padding: 5px;
 }
+
+.authorLabel{
+	-fx-text-alignment: center;
+	-fx-background-color: red;
+}
+
+.ownMessagePane{
+	-fx-background-color: #702400;
+}
+.partnerMessagePane{
+	-fx-background-color: #777;
+}
+
+
+#sendPane{
+	-fx-background-color:#000;
+}
+
 #sendPane .content{
-	-fx-background-color: #666666;
+	-fx-background-color: #454545;
 	-fx-border-width:0,0,0,0;
 }
 
-#sendPane .textarea{
-	-fx-background-color: #777777;
-}
-
-#messageoptionPane{
+#messageOptionPane{
 	-fx-max-height: 30px;
 }
-
 
 #bSend {
 	-fx-min-width: 90px;
@@ -102,3 +80,60 @@
 	-fx-background-color:
 		linear-gradient(#000000 0%, #565656 50%, #000000 100%);
 }
+
+/*chatoptionregion */
+
+#activeChatsList, #userTree{
+	-fx-background-color: #333;
+	-fx-text-fill: #FFF;
+}
+
+.list-cell:even{
+	-fx-background-color: #555;
+}
+.list-cell:odd{
+	-fx-background-color: #454545;
+}
+.list-cell:filled:hover{
+	-fx-font-weight: bold;
+}
+.list-cell:filled:selected{
+
+}
+.deleteButton{
+
+}
+
+
+
+#userTree .tree-cell{
+	-fx-background-color: #333;
+	-fx-text-fill: #FFF;
+}
+
+.tree-cell {
+    -fx-padding: 0.75em 0em 0.75em 0em ;
+}
+.tree-cell:expanded, .tree-cell:sub-tree-item {
+    -fx-background-color: #404040;
+}
+
+.tree-cell:hovered{
+	-fx-font-weight: bold;
+}
+.tree-view .scroll-bar:vertical{
+-fx-background-color: #000;
+}
+
+.tree-view .scroll-bar:horizontal{
+-fx-background-color: #000;
+}
+
+
+
+
+
+
+
+
+

@@ -51,13 +51,11 @@ public class ChatController {
 	@FXML
 	private ListView<ActiveChatCell> activeChatsList;
 	@FXML
-	private BorderPane messagePane;
+	private AnchorPane messagePane;
 	@FXML
 	private Button bSend;
 	@FXML
 	private TextArea sendTextArea;
-	@FXML
-	private AnchorPane messageAnchorPane;
 
 	public ChatController(SagMaClient client, String username) {
 		this.client = client;
@@ -106,10 +104,13 @@ public class ChatController {
 	 *
 	 */
 	private void openChatPane(ChatPane pane, String partner) {
-//		messagePane = pane;
-//		messagePane.getChildren().clear();
-		messageAnchorPane.getChildren().clear();
-		messageAnchorPane.getChildren().add(pane);
+		AnchorPane.setTopAnchor(pane, 0.0);
+		AnchorPane.setBottomAnchor(pane, 0.0);
+		AnchorPane.setLeftAnchor(pane, 0.0);
+		AnchorPane.setRightAnchor(pane, 0.0);
+
+		messagePane.getChildren().clear();
+		messagePane.getChildren().add(pane);
 		Platform.runLater(new Runnable() {
 			@Override
 			public void run() {
@@ -121,7 +122,6 @@ public class ChatController {
 
 	private ChatPane getChatPane(String partner) {
 //		messagePane.setStyle("-fx-background-color:red");
-		messageAnchorPane.setStyle(".fx.background-color: green");
 		ChatPane pane = chats.get(partner);
 		if (pane == null) {
 			pane = new ChatPane(partner, username);
@@ -141,6 +141,9 @@ public class ChatController {
 	}
 
 	public void closeChatPane(String partner) {
+		if(this.activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(partner)){
+			messagePane.getChildren().clear();
+		}
 		chats.remove(partner);
 		activeChats.remove(partner);
 		activeChatsCells.remove(getActiveChatCell(partner));

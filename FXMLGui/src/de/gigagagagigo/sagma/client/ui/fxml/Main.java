@@ -45,9 +45,9 @@ public class Main extends Application {
 			FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/chat.fxml"));
 			loader.setController(controller);
 //			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));
-//			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
 			BorderPane root = loader.load();
 			Scene scene = new Scene(root, 550, 550);
+			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
 			primaryStage.setScene(scene);
 
 			primaryStage.show();

@@ -67,6 +67,7 @@ public class ChatController {
 	private void initialize() {
 		activeChatsList.setItems(activeChatsCells);
 		userTreeItem.setValue("Users");
+		sendTextArea.setWrapText(true);
 
 		userTree.setOnMouseClicked((e) -> {
 			if (e.getClickCount() == 2 && userTree.getSelectionModel().getSelectedItem().getValue() != null
@@ -124,7 +125,7 @@ public class ChatController {
 //		messagePane.setStyle("-fx-background-color:red");
 		ChatPane pane = chats.get(partner);
 		if (pane == null) {
-			pane = new ChatPane(partner, username);
+			pane = new ChatPane(partner, username, messagePane);
 			pane.getStyleClass().add("chatPane");
 			chats.put(partner, pane);
 			activeChats.add(partner);

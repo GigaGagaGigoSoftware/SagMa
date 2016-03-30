@@ -45,21 +45,16 @@ public class LogInController {
 			SagMaClient client = new SagMaClient();
 			client.setPacketHandler(p -> {
 				if (p instanceof LogInReplyPacket) {
-					System.out.println("Test1");
 					LogInReplyPacket reply = (LogInReplyPacket) p;
 					if (reply.success) {
-						System.out.println("Test2");
 						Platform.runLater(()->{
-							System.out.println("LogInReply1");
 							this.closeWindow();
 							Main.showChat(client, request.username);
 						});
 					} else{
-						System.out.println("LogInError1");
 						Platform.runLater(()-> changeButtonAccess());
 					}
 				} else{
-					System.out.println("LogInError2");
 					Platform.runLater(()-> changeButtonAccess());
 				}
 			});

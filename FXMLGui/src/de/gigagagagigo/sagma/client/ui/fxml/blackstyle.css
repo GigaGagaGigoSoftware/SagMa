@@ -32,6 +32,26 @@
 	-fx-background-color: #323232;
 }
 
+#chatPane{
+	-fx-background-color: #424242;
+	-fx-spacing: 5px;
+	-fx-padding: 5 0 0 0;
+	-fx-focus-color: transparent;
+}
+#chatPane:focused{
+	-fx-focus-color: transparent;
+}
+
+.scroll-pane{
+	-fx-focus-color: transparent;
+	-fx-background-insets: 0;
+	-fx-padding: 0;
+}
+.scroll-pane:focused{
+	-fx-focus-color: transparent;
+	-fx-background-insets: 0;
+}
+
 .ownMessagePane, .partnerMessagePane{
 	-fx-background-radius: 8;
 	-fx-padding: 5px;

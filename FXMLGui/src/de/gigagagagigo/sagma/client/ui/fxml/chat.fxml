@@ -23,24 +23,24 @@
    <top>
       <MenuBar id="menuBar" BorderPane.alignment="CENTER">
         <menus>
-          <Menu id="mSagMa" mnemonicParsing="false" text="SagMa">
+          <Menu fx:id="mSagMa" mnemonicParsing="false" text="%mSagMa">
             <items>
-              <MenuItem id="miClose" mnemonicParsing="false" text="Close" />
-              <MenuItem id="miNameChange" mnemonicParsing="false" text="Namen ändern" />
-              <MenuItem id="miStatus" mnemonicParsing="false" text="Onlinestatus" />
-              <MenuItem id="miLogOut" mnemonicParsing="false" text="Abmelden" />
+              <MenuItem fx:id="miClose" mnemonicParsing="false" text="%miClose" />
+              <MenuItem fx:id="miNameChange" mnemonicParsing="false" text="%miNameChange" />
+              <MenuItem fx:id="miStatus" mnemonicParsing="false" text="%miStatus" />
+              <MenuItem fx:id="miLogOut" mnemonicParsing="false" text="%miLogOut" />
             </items>
           </Menu>
-          <Menu id="mActions" mnemonicParsing="false" text="Aktionen">
+          <Menu fx:id="mActions" mnemonicParsing="false" text="%mActions">
             <items>
-              <MenuItem id="miChangeLanguage" mnemonicParsing="false" text="Sprache ändern" />
-              <MenuItem id="miOptions" mnemonicParsing="false" text="Optionen" />
+              <MenuItem fx:id="miChangeLanguage" mnemonicParsing="false" text="%miLanguage" />
+              <MenuItem fx:id="miOptions" mnemonicParsing="false" text="%miOptions" />
             </items>
           </Menu>
-          <Menu id="mHelp" mnemonicParsing="false" text="Hilfe">
+          <Menu fx:id="mHelp" mnemonicParsing="false" text="%mHelp">
             <items>
-              <MenuItem id="miAbout" mnemonicParsing="false" text="über SagMa" />
-              <MenuItem id="miTerms" mnemonicParsing="false" text="Nutzungsbedingungen" />
+              <MenuItem fx:id="miAbout" mnemonicParsing="false" text="%miAbout" />
+              <MenuItem fx:id="miTerms" mnemonicParsing="false" text="%miTerms" />
             </items>
           </Menu>
         </menus>
@@ -62,7 +62,7 @@
                            <children>
                               <BorderPane id="sendPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <right>
-                                    <Button fx:id="bSend" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="9000000.0" text="Senden" BorderPane.alignment="CENTER" />
+                                    <Button fx:id="bSend" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="9000000.0" text="%sendButton" onAction="#sendMessage" BorderPane.alignment="CENTER" />
                                  </right>
                                  <top>
                                     <Pane id="messageOptionPane" prefHeight="20.0" BorderPane.alignment="CENTER" />
@@ -87,7 +87,7 @@
                                  <top>
                                     <HBox id="activeChatsLabelPane" alignment="CENTER" BorderPane.alignment="CENTER">
                                        <children>
-                                          <Label id="activeChatsLabel" text="aktive Chats" />
+                                          <Label id="activeChatsLabel" text="%activeList" />
                                        </children>
                                     </HBox>
                                  </top>
@@ -103,13 +103,13 @@
                                  <top>
                                     <HBox id="userLabelPane" alignment="CENTER" BorderPane.alignment="CENTER">
                                        <children>
-                                          <Label id="userLabel" alignment="CENTER" contentDisplay="CENTER" text="Gruppen und User" />
+                                          <Label id="userLabel" alignment="CENTER" contentDisplay="CENTER" text="%userList" />
                                        </children>
                                     </HBox>
                                  </top>
                                  <center>
         	                            <TreeView fx:id="userTree" BorderPane.alignment="CENTER" >
-        	                            	<TreeItem fx:id="userTreeItem" />
+        	                            	<TreeItem fx:id="userTreeItem" value="%users"/>
         	                            </TreeView>
                                  </center>
                               </BorderPane>

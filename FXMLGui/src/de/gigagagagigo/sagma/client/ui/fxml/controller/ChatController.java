@@ -1,7 +1,7 @@
 package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
-import java.net.URL;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -11,27 +11,24 @@ import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packets.ChatMessagePacket;
 import de.gigagagagigo.sagma.packets.UserListReplyPacket;
 import de.gigagagagigo.sagma.packets.UserListRequestPacket;
+import de.gigagagagigo.sagma.packets.UserListUpdatePacket;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 
 public class ChatController {
@@ -42,8 +39,10 @@ public class ChatController {
 	private final ObservableList<String> activeChats = FXCollections.observableArrayList();
 	private final ObservableList<ActiveChatCell> activeChatsCells = FXCollections.observableArrayList();
 
-	TreeItem<String> tiUsers;
 
+	TreeItem<String> tiUsers;
+	@FXML
+	private ResourceBundle resources;
 	@FXML
 	private TreeView<String> userTree;
 	@FXML
@@ -56,6 +55,14 @@ public class ChatController {
 	private Button bSend;
 	@FXML
 	private TextArea sendTextArea;
+	@FXML
+	private Label activeChatsLabel;
+	@FXML
+	private Label userLabel;
+	@FXML
+	private Menu mSagMa, mActions, mHelp;
+	@FXML
+	private MenuItem miClose, miNameChange, miStatus, miLogOut, miChangeLanguage, miOptions, miAbout, miTerms;
 
 	public ChatController(SagMaClient client, String username) {
 		this.client = client;
@@ -65,8 +72,9 @@ public class ChatController {
 
 	@FXML
 	private void initialize() {
+		resources = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat", new Locale("en", "EN"));
+
 		activeChatsList.setItems(activeChatsCells);
-		userTreeItem.setValue("Users");
 		sendTextArea.setWrapText(true);
 
 		userTree.setOnMouseClicked((e) -> {
@@ -88,7 +96,6 @@ public class ChatController {
 			}
 		});
 
-		bSend.setOnAction((e) -> sendMessage());
 		sendTextArea.setOnKeyReleased((e) -> {
 			if (e.getCode().equals(KeyCode.ENTER) && e.isShiftDown()) {
 				sendTextArea.appendText("\n");
@@ -99,6 +106,7 @@ public class ChatController {
 
 		sendPacket(new UserListRequestPacket());
 	}
+
 
 	/**
 	 * TODO Open the Chatpane
@@ -122,7 +130,6 @@ public class ChatController {
 	}
 
 	private ChatPane getChatPane(String partner) {
-//		messagePane.setStyle("-fx-background-color:red");
 		ChatPane pane = chats.get(partner);
 		if (pane == null) {
 			pane = new ChatPane(partner, username, messagePane);
@@ -159,7 +166,7 @@ public class ChatController {
 		return null;
 	}
 
-	private void sendMessage() {
+	public void sendMessage() {
 		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
 			sendTextArea.setStyle(" -fx-border-color: blue;");
 			String partner = activeChatsList.getSelectionModel().getSelectedItem().getPartner();
@@ -181,14 +188,6 @@ public class ChatController {
 	}
 
 	/**
-	 * TODO Update
-	 */
-
-	private void updateUserTree() {
-		sendPacket(new UserListRequestPacket());
-	}
-
-	/**
 	 * PacketHandler
 	 */
 
@@ -197,12 +196,19 @@ public class ChatController {
 	 * @param packet
 	 */
 	private void handlePacket(Packet packet) {
-		if (packet instanceof UserListReplyPacket) {
+		if (packet instanceof UserListUpdatePacket) {
+			UserListUpdatePacket update = (UserListUpdatePacket) packet;
+			System.out.println("handlepacket");
+			Platform.runLater(() -> {
+				System.out.println("runlaterhandlepacket");
+				handleUserListUpdate(update);
+			});
+		}else if (packet instanceof UserListReplyPacket) {
 			UserListReplyPacket reply = (UserListReplyPacket) packet;
 			Platform.runLater(() -> {
 				handleUserListReply(reply);
 			});
-		} else if (packet instanceof ChatMessagePacket) {
+		}else if (packet instanceof ChatMessagePacket) {
 			ChatMessagePacket message = (ChatMessagePacket) packet;
 			Platform.runLater(() -> {
 				getChatPane(message.username).handleChatMessage(message);
@@ -212,6 +218,31 @@ public class ChatController {
 
 	public void sendPacket(Packet packet) {
 		client.sendPacket(packet);
+	}
+
+	private void handleUserListUpdate(UserListUpdatePacket update) {
+		System.out.println("update");
+		if(update.removed != null){
+			System.out.println("removed");
+			for(String user : update.removed){
+				for(TreeItem<String> item : userTreeItem.getChildren()){
+					if(item.getValue().equals(user)){
+						userTreeItem.getChildren().remove(item);
+						break;
+					}
+				}
+			}
+		}
+		if(update.added != null){
+			System.out.println("added");
+			for(String user : update.added){
+				userTreeItem.getChildren().add(new TreeItem<String>(user));
+			}
+		}
+//		userTreeItem.setExpanded(true);
+//		userTreeItem.getChildren().add(new TreeItem<String>("Test1"));
+//		userTree.setRoot(userTreeItem);
+
 	}
 
 	private void handleUserListReply(UserListReplyPacket reply) {

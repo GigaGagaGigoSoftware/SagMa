@@ -16,12 +16,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 
 public class Main extends Application {
 
 	private Stage primaryStage;
 	private String username, server;
 	private LogInRequestPacket request;
+	private static ResourceBundle language;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -30,6 +32,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
+		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat", new Locale("en", "EN"));
 		showLogIn();
 	}
 
@@ -44,7 +47,7 @@ public class Main extends Application {
 			ChatController controller = new ChatController(client, username);
 			FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/chat.fxml"));
 			loader.setController(controller);
-//			loader.setResources(ResourceBundle.getBundle("language\\chat", new Locale("en", "EN")));
+			loader.setResources(language);
 			BorderPane root = loader.load();
 			Scene scene = new Scene(root, 550, 550);
 			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
@@ -59,7 +62,8 @@ public class Main extends Application {
 	private boolean showLogIn() {
 		try {
 			FXMLLoader loader = new FXMLLoader();
-			BorderPane root = loader.load(getClass().getResource("LogIn.fxml").openStream());
+			loader.setResources(language);
+			GridPane root = loader.load(getClass().getResource("LogIn.fxml").openStream());
 			Stage loginStage = new Stage();
 			loginStage.setTitle("Log In");
 			loginStage.initModality(Modality.WINDOW_MODAL);

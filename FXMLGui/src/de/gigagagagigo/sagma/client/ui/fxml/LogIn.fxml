@@ -4,25 +4,20 @@
 <?import javafx.scene.control.*?>
 
 
-<BorderPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
-	minHeight="-Infinity" minWidth="-Infinity" prefHeight="550.0"
-	prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.gigagagagigo.sagma.client.ui.fxml.controller.LogInController">
-	<center>
-		<VBox>
-			<HBox>
-				<Label fx:id="serverLabel" text="Server:" />
-				<TextField fx:id="tfServer" />
-			</HBox>
-			<HBox>
-				<Label fx:id="usernameLabel" text="Username:" />
-				<TextField fx:id="tfUsername" />
-			</HBox>
-			<HBox>
-				<Button fx:id="okButton" onAction="#handleOK" text="OK" />
-				<Button onAction="#handleCancel" text="Cancel" />
-			</HBox>
-		</VBox>
-	</center>
-</BorderPane>
+<GridPane id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
+	minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0"
+	prefWidth="280.0" hgap="10" vgap="5" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="de.gigagagagigo.sagma.client.ui.fxml.controller.LogInController">
+
+	<Label fx:id="serverLabel" text="Server:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+	<TextField fx:id="tfServer" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+	<Label fx:id="usernameLabel" text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+	<TextField fx:id="tfUsername" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+	<Button fx:id="okButton" onAction="#handleOK" text="OK" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+	<Button fx:id="cancelButton" onAction="#handleCancel" text="Cancel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+</GridPane>
 
 

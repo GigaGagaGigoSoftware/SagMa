@@ -1,5 +1,7 @@
 package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
+import java.util.ResourceBundle;
+
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.Main;
 import de.gigagagagigo.sagma.packets.LogInReplyPacket;
@@ -7,6 +9,7 @@ import de.gigagagagigo.sagma.packets.LogInRequestPacket;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -18,6 +21,12 @@ public class LogInController {
 	private TextField tfUsername;
 	@FXML
 	private Button okButton;
+	@FXML
+	private Button cancelButton;
+	@FXML
+	private Label serverLabel;
+	@FXML
+	private Label usernameLabel;
 
 	private Stage loginStage;
 	private boolean okClicked = false;
@@ -25,7 +34,12 @@ public class LogInController {
 	private LogInRequestPacket request;
 
 	@FXML
-	private void initialize() {
+	private void initialize(ResourceBundle resources) {
+		ResourceBundle bundle = resources;
+		serverLabel.setText(bundle.getString("server"));
+		usernameLabel.setText(bundle.getString("user"));
+		okButton.setText(bundle.getString("login"));
+		cancelButton.setText(bundle.getString("cancel"));
 	}
 
 	public void setLoginStage(Stage loginStage) {

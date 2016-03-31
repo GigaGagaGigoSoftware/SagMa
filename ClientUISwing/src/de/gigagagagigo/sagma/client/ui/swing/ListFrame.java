@@ -7,22 +7,16 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import de.gigagagagigo.sagma.packets.UserListReplyPacket;
-import de.gigagagagigo.sagma.packets.UserListRequestPacket;
+import de.gigagagagigo.sagma.packets.UserListUpdatePacket;
 
 public class ListFrame extends JFrame {
 
-	private final WindowManager manager;
-
-	private JList<String> list;
-	private JButton update;
+	private final DefaultListModel<String> model;
+	private final JList<String> list;
 
 	public ListFrame(WindowManager manager) {
-		this.manager = manager;
-		list = new JList<>();
-
-		update = new JButton("Aktualisieren");
-		update.addActionListener(e -> update());
+		model = new DefaultListModel<>();
+		list = new JList<>(model);
 
 		list.addMouseListener(new MouseAdapter() {
 			@Override
@@ -35,8 +29,7 @@ public class ListFrame extends JFrame {
 
 		JPanel content = new JPanel(new BorderLayout(5, 5));
 		content.setBorder(new EmptyBorder(5, 5, 5, 5));
-		content.add(list, BorderLayout.CENTER);
-		content.add(update, BorderLayout.SOUTH);
+		content.add(new JScrollPane(list), BorderLayout.CENTER);
 		setContentPane(content);
 
 		addWindowListener(new WindowAdapter() {
@@ -52,21 +45,15 @@ public class ListFrame extends JFrame {
 		setMinimumSize(new Dimension(200, 300));
 		setLocationRelativeTo(null);
 		setVisible(true);
-
-		update();
 	}
 
-	private void update() {
-		update.setEnabled(false);
-		manager.sendPacket(new UserListRequestPacket());
-	}
-
-	public void handleUserListReply(UserListReplyPacket reply) {
-		DefaultListModel<String> model = new DefaultListModel<>();
-		for (String user : reply.users)
-			model.addElement(user);
-		list.setModel(model);
-		update.setEnabled(true);
+	public void handleUserListUpdate(UserListUpdatePacket update) {
+		if (update.removed != null)
+			for (String user : update.removed)
+				model.removeElement(user);
+		if (update.added != null)
+			for (String user : update.added)
+				model.addElement(user);
 	}
 
 }

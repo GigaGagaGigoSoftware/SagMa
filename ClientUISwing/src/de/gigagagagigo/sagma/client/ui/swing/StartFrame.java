@@ -70,10 +70,8 @@ public class StartFrame extends JFrame implements ActionListener {
 				if (p instanceof LogInReplyPacket) {
 					LogInReplyPacket reply = (LogInReplyPacket) p;
 					if (reply.success) {
-						SwingUtilities.invokeLater(() -> {
-							dispose();
-							new WindowManager(client, request.username);
-						});
+						SwingUtilities.invokeLater(() -> dispose());
+						new WindowManager(client, request.username);
 					} else {
 						SwingUtilities.invokeLater(() -> {
 							JOptionPane.showMessageDialog(

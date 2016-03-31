@@ -44,15 +44,23 @@ public class PacketDataInputStream implements AutoCloseable {
 	}
 
 	public String readString() throws IOException {
-		int length = in.readInt();
+		int length = readInt();
 		if (length < 0) {
 			return null;
 		} else {
 			byte[] bytes = new byte[length];
 			for (int i = 0; i < length; i++)
-				bytes[i] = in.readByte();
+				bytes[i] = readByte();
 			return new String(bytes, "UTF-8");
 		}
+	}
+
+	public String[] readStringArray() throws IOException {
+		int length = readInt();
+		String[] data = (length < 0) ? null : new String[length];
+		for (int i = 0; i < length; i++)
+			data[i] = readString();
+		return data;
 	}
 
 	@Override

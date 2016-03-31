@@ -20,7 +20,7 @@ public class WindowManager {
 		this.client = client;
 		this.username = username;
 		this.client.setPacketHandler(this::handlePacket);
-		list = new ListFrame(this);
+		SwingUtilities.invokeLater(() -> list = new ListFrame(this));
 	}
 
 	public String getUsername() {
@@ -28,11 +28,11 @@ public class WindowManager {
 	}
 
 	private void handlePacket(Packet packet) {
-		if (packet instanceof UserListReplyPacket) {
-			UserListReplyPacket reply = (UserListReplyPacket) packet;
+		if (packet instanceof UserListUpdatePacket) {
+			UserListUpdatePacket update = (UserListUpdatePacket) packet;
 			SwingUtilities.invokeLater(() -> {
 				if (list != null) {
-					list.handleUserListReply(reply);
+					list.handleUserListUpdate(update);
 				}
 			});
 		} else if (packet instanceof ChatMessagePacket) {

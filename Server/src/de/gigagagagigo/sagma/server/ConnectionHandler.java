@@ -65,6 +65,11 @@ public class ConnectionHandler implements Runnable {
 		LogInReplyPacket reply = new LogInReplyPacket();
 		reply.success = success;
 		out.write(reply);
+		if (success) {
+			UserListUpdatePacket update = new UserListUpdatePacket();
+			update.added = getCustomUserList();
+			out.write(update);
+		}
 		new Thread(new Writer()).start();
 		return success;
 	}
@@ -93,13 +98,18 @@ public class ConnectionHandler implements Runnable {
 
 	private void handleUserListRequest(UserListRequestPacket request) throws IOException {
 		UserListReplyPacket reply = new UserListReplyPacket();
-		String[] serverUsers = server.getUsers();
-		reply.users = new String[serverUsers.length - 1];
-		for (int serverIndex = 0, index = 0; serverIndex < serverUsers.length
-			&& index < reply.users.length; serverIndex++)
-			if (!serverUsers[serverIndex].equals(username))
-				reply.users[index++] = serverUsers[serverIndex];
+		reply.users = getCustomUserList();
 		queue.add(reply);
+	}
+
+	private String[] getCustomUserList() {
+		String[] serverUsers = server.getUsers();
+		String[] customUsers = new String[serverUsers.length - 1];
+		for (int serverIndex = 0, index = 0; serverIndex < serverUsers.length
+			&& index < customUsers.length; serverIndex++)
+			if (!serverUsers[serverIndex].equals(username))
+				customUsers[index++] = serverUsers[serverIndex];
+		return customUsers;
 	}
 
 	private void close() {
@@ -117,6 +127,10 @@ public class ConnectionHandler implements Runnable {
 		ChatMessagePacket packet = new ChatMessagePacket();
 		packet.username = username;
 		packet.message = message;
+		queue.add(packet);
+	}
+
+	public void sendPacket(Packet packet) {
 		queue.add(packet);
 	}
 

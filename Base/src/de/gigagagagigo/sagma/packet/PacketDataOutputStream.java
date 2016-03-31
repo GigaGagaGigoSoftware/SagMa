@@ -45,13 +45,20 @@ public class PacketDataOutputStream implements AutoCloseable {
 
 	public void writeString(String data) throws IOException {
 		if (data == null) {
-			out.writeInt(-1);
+			writeInt(-1);
 		} else {
 			byte[] bytes = data.getBytes("UTF-8");
-			out.writeInt(bytes.length);
+			writeInt(bytes.length);
 			for (int i = 0; i < bytes.length; i++)
-				out.writeByte(bytes[i]);
+				writeByte(bytes[i]);
 		}
+	}
+
+	public void writeStringArray(String[] data) throws IOException {
+		int length = (data == null) ? -1 : data.length;
+		writeInt(length);
+		for (int i = 0; i < length; i++)
+			writeString(data[i]);
 	}
 
 	@Override

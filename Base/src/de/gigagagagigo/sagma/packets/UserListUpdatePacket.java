@@ -4,18 +4,21 @@ import java.io.IOException;
 
 import de.gigagagagigo.sagma.packet.*;
 
-public class UserListReplyPacket implements Packet {
+public class UserListUpdatePacket implements Packet {
 
-	public String[] users;
+	public String[] added;
+	public String[] removed;
 
 	@Override
 	public void read(PacketDataInputStream in) throws IOException {
-		users = in.readStringArray();
+		added = in.readStringArray();
+		removed = in.readStringArray();
 	}
 
 	@Override
 	public void write(PacketDataOutputStream out) throws IOException {
-		out.writeStringArray(users);
+		out.writeStringArray(added);
+		out.writeStringArray(removed);
 	}
 
 }

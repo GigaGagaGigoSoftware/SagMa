@@ -1,22 +1,23 @@
 package de.gigagagagigo.sagma.server;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.gigagagagigo.sagma.SagMa;
 import de.gigagagagigo.sagma.net.*;
+import de.gigagagagigo.sagma.packets.UserListUpdatePacket;
 
 public class SagMaServer implements Runnable {
 
 	private static final String[] STRING_ARRAY = new String[0];
 
 	private final ConnectionPoint connectionPoint;
-	private final ConcurrentMap<String, ConnectionHandler> activeHandlers;
+	private final Map<String, ConnectionHandler> activeHandlers;
 
 	public SagMaServer() throws IOException {
 		this.connectionPoint = NetworkFactories.get().openConnectionPoint(SagMa.PORT);
-		this.activeHandlers = new ConcurrentHashMap<>();
+		this.activeHandlers = new HashMap<>();
 	}
 
 	public void start() {
@@ -42,20 +43,32 @@ public class SagMaServer implements Runnable {
 		}
 	}
 
-	public boolean register(String username, ConnectionHandler handler) {
-		return activeHandlers.putIfAbsent(username, handler) == null;
+	public synchronized boolean register(String username, ConnectionHandler handler) {
+		if (!activeHandlers.containsKey(username)) {
+			UserListUpdatePacket update = new UserListUpdatePacket();
+			update.added = new String[] { username };
+			activeHandlers.values().forEach(h -> h.sendPacket(update));
+			activeHandlers.put(username, handler);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	public void unregister(String username) {
-		if (username != null)
+	public synchronized void unregister(String username) {
+		if (username != null && activeHandlers.containsKey(username)) {
 			activeHandlers.remove(username);
+			UserListUpdatePacket update = new UserListUpdatePacket();
+			update.removed = new String[] { username };
+			activeHandlers.values().forEach(h -> h.sendPacket(update));
+		}
 	}
 
-	public String[] getUsers() {
+	public synchronized String[] getUsers() {
 		return activeHandlers.keySet().toArray(STRING_ARRAY);
 	}
 
-	public void sendMessage(String from, String to, String message) {
+	public synchronized void sendMessage(String from, String to, String message) {
 		activeHandlers.computeIfPresent(to, (key, handler) -> {
 			handler.sendMessage(from, message);
 			return handler;

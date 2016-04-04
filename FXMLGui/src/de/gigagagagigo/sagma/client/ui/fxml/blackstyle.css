@@ -115,15 +115,20 @@
 	-fx-background-color: #454545;
 }
 .list-cell:filled:hover{
-	-fx-font-weight: bold;
-}
-.list-cell:filled:selected{
 
+}
+.list-cell:filled:selected .label{
+	-fx-font-weight: bold;
 }
 .deleteButton{
 
 }
-
+.unreadMessage{
+	/*
+	-fx-background-color: #db8808;
+	 */
+	-fx-text-fill: #db8808;
+}
 
 
 #userTree .tree-cell{

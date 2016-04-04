@@ -12,6 +12,8 @@ import de.gigagagagigo.sagma.packets.ChatMessagePacket;
 import de.gigagagagigo.sagma.packets.UserListReplyPacket;
 import de.gigagagagigo.sagma.packets.UserListRequestPacket;
 import de.gigagagagigo.sagma.packets.UserListUpdatePacket;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -30,6 +32,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.util.Duration;
 
 public class ChatController {
 
@@ -38,7 +41,6 @@ public class ChatController {
 	private final Map<String, ChatPane> chats = new HashMap<String, ChatPane>();
 	private final ObservableList<String> activeChats = FXCollections.observableArrayList();
 	private final ObservableList<ActiveChatCell> activeChatsCells = FXCollections.observableArrayList();
-
 
 	TreeItem<String> tiUsers;
 	@FXML
@@ -72,7 +74,8 @@ public class ChatController {
 
 	@FXML
 	private void initialize() {
-		resources = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat", new Locale("en", "EN"));
+		resources = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat",
+				new Locale("en", "EN"));
 
 		activeChatsList.setItems(activeChatsCells);
 		sendTextArea.setWrapText(true);
@@ -93,6 +96,7 @@ public class ChatController {
 				if (!activeChats.isEmpty()) {
 					openChatPane(getChatPane(newPartner.getPartner()), newPartner.getPartner());
 				}
+				newPartner.changeNewMessage(false);
 			}
 		});
 
@@ -107,11 +111,6 @@ public class ChatController {
 		sendPacket(new UserListRequestPacket());
 	}
 
-
-	/**
-	 * TODO Open the Chatpane
-	 *
-	 */
 	private void openChatPane(ChatPane pane, String partner) {
 		AnchorPane.setTopAnchor(pane, 0.0);
 		AnchorPane.setBottomAnchor(pane, 0.0);
@@ -149,7 +148,7 @@ public class ChatController {
 	}
 
 	public void closeChatPane(String partner) {
-		if(this.activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(partner)){
+		if (this.activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(partner)) {
 			messagePane.getChildren().clear();
 		}
 		chats.remove(partner);
@@ -203,16 +202,30 @@ public class ChatController {
 				System.out.println("runlaterhandlepacket");
 				handleUserListUpdate(update);
 			});
-		}else if (packet instanceof UserListReplyPacket) {
+		} else if (packet instanceof UserListReplyPacket) {
 			UserListReplyPacket reply = (UserListReplyPacket) packet;
 			Platform.runLater(() -> {
 				handleUserListReply(reply);
 			});
-		}else if (packet instanceof ChatMessagePacket) {
+		} else if (packet instanceof ChatMessagePacket) {
 			ChatMessagePacket message = (ChatMessagePacket) packet;
 			Platform.runLater(() -> {
-				getChatPane(message.username).handleChatMessage(message);
+				newMessage(message);
 			});
+		}
+	}
+
+	private void newMessage(ChatMessagePacket message) {
+		getChatPane(message.username).handleChatMessage(message);
+
+		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
+			if (!activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(message.username)) {
+				for (ActiveChatCell cell : activeChatsList.getItems()) {
+					if (cell.getPartner().equals(message.username)) {
+						cell.changeNewMessage(true);
+					}
+				}
+			}
 		}
 	}
 
@@ -222,26 +235,26 @@ public class ChatController {
 
 	private void handleUserListUpdate(UserListUpdatePacket update) {
 		System.out.println("update");
-		if(update.removed != null){
+		if (update.removed != null) {
 			System.out.println("removed");
-			for(String user : update.removed){
-				for(TreeItem<String> item : userTreeItem.getChildren()){
-					if(item.getValue().equals(user)){
+			for (String user : update.removed) {
+				for (TreeItem<String> item : userTreeItem.getChildren()) {
+					if (item.getValue().equals(user)) {
 						userTreeItem.getChildren().remove(item);
 						break;
 					}
 				}
 			}
 		}
-		if(update.added != null){
+		if (update.added != null) {
 			System.out.println("added");
-			for(String user : update.added){
+			for (String user : update.added) {
 				userTreeItem.getChildren().add(new TreeItem<String>(user));
 			}
 		}
-//		userTreeItem.setExpanded(true);
-//		userTreeItem.getChildren().add(new TreeItem<String>("Test1"));
-//		userTree.setRoot(userTreeItem);
+		// userTreeItem.setExpanded(true);
+		// userTreeItem.getChildren().add(new TreeItem<String>("Test1"));
+		// userTree.setRoot(userTreeItem);
 
 	}
 
@@ -259,24 +272,44 @@ public class ChatController {
 	}
 
 	/**
-	 * ListItem with button for delete
+	 * ListItem for active Chats It contains a region for showing that unread
+	 * messages exists, a label for the partner and a delete button
 	 *
 	 */
 	public static class ActiveChatCell extends HBox {
-		Label label = new Label();
+		Label lPartner;
 		Button button;
 		String partner;
+		FadeTransition ft;
 
 		ActiveChatCell(String partner, Button button) {
 			super();
 			this.button = button;
 			this.partner = partner;
-			label.setText(partner);
-			label.setMaxWidth(Double.MAX_VALUE);
-			HBox.setHgrow(label, Priority.ALWAYS);
+			lPartner = new Label(partner);
+			lPartner.setMaxWidth(Double.MAX_VALUE);
+			lPartner.getStyleClass().add("unreadMessage");
+			HBox.setHgrow(lPartner, Priority.ALWAYS);
 			button.setText("X");
 
-			this.getChildren().addAll(label, button);
+			ft = new FadeTransition(Duration.millis(800), lPartner);
+			ft.setFromValue(1.0);
+			ft.setToValue(0.4);
+			ft.setCycleCount(Animation.INDEFINITE);
+			ft.setAutoReverse(true);
+
+			this.setSpacing(3);
+			this.getChildren().addAll(lPartner, button);
+		}
+
+		public void changeNewMessage(boolean isNew) {
+			if (isNew) {
+				lPartner.getStyleClass().add("unreadMessage");
+				ft.play();
+			} else {
+				lPartner.getStyleClass().remove("unreadMessage");
+				ft.stop();
+			}
 		}
 
 		public String getPartner() {

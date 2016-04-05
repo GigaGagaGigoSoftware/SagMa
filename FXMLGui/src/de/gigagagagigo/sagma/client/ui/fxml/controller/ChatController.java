@@ -294,6 +294,8 @@ public class ChatController {
 			lPartner.getStyleClass().add("unreadMessage");
 			HBox.setHgrow(lPartner, Priority.ALWAYS);
 			button.setText("X");
+			button.getStyleClass().add("deleteButton");
+			button.setMaxHeight(10);
 
 			ft = new FadeTransition(Duration.millis(800), lPartner);
 			ft.setFromValue(1.0);

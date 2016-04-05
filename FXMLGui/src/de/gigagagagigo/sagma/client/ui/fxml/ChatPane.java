@@ -1,6 +1,7 @@
 package de.gigagagagigo.sagma.client.ui.fxml;
 
 import de.gigagagagigo.sagma.packets.ChatMessagePacket;
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
@@ -12,21 +13,31 @@ public class ChatPane extends ScrollPane {
 
 	private String username;
 	private VBox messages = new VBox();
+	private AnimationTimer timer;
 
 	public ChatPane(String partner, String username, AnchorPane messagePane) {
 		this.username = username;
 		this.setContent(messages);
 		this.setHbarPolicy(ScrollBarPolicy.NEVER);
+		this.setVbarPolicy(ScrollBarPolicy.ALWAYS);
 //		messages.getStyleClass().add("chatPane");
 		messages.setId("chatPane");
 		messages.setFillWidth(false);
 		messages.minWidthProperty().bind(this.widthProperty());
 		messages.minHeightProperty().bind(this.heightProperty());
-
+		timer = new AnimationTimer(){
+			@Override
+			public void handle(long now){
+				Platform.runLater(()->{
+					scrollDown();
+				});
+			}
+		};
 	}
 
 	private void scrollDown() {
 		this.setVvalue(1.0);
+		timer.stop();
 	}
 
 	public void handleChatMessage(ChatMessagePacket message) {
@@ -36,17 +47,13 @@ public class ChatPane extends ScrollPane {
 	public void appendMessage(String author, String message) {
 		MessagePane messagePane = createMessagePane(author, message);
 		messagePane.getStyleClass().add("partnerMessagePane");
-		Platform.runLater(() -> {
-			scrollDown();
-		});
+			timer.start();
 	}
 
 	public void appendOwnMessage(String message) {
 		MessagePane messagePane = createMessagePane(this.username, message);
 		messagePane.getStyleClass().add("ownMessagePane");
-		Platform.runLater(() -> {
-			scrollDown();
-		});
+			timer.start();
 	}
 
 	private MessagePane createMessagePane(String author, String message) {

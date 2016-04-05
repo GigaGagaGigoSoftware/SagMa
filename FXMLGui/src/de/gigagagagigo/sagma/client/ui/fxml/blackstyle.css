@@ -3,6 +3,11 @@
 }
 
 /*ScrollBars */
+.scroll-bar{
+	-fx-background-color: transparent;
+	-fx-background-color: #424242;
+	-fx-border-color: #424242;
+}
 .scroll-bar:vertical .track,
 .scroll-bar:horizontal .track{
 	-fx-background-color: transparent;
@@ -22,9 +27,13 @@
 	-fx-padding: 0;
 }
 .scroll-bar .thumb{
-	-fx-background-color: derive(#000, 90%);
+	-fx-background-color: transparent;
 	-fx-background-insets: 2, 0, 0;
 	-fx-background-radius: 2px;
+}
+.scroll-bar:hover .thumb,
+.scroll-bar .thumb:pressed{
+	-fx-background-color: derive(#000, 90%);
 }
 
 
@@ -154,8 +163,17 @@
 	-fx-font-weight: bold;
 }
 .deleteButton{
-
+	-fx-background-color: transparent;
+	-fx-border-radius: 50px;
+	-fx-border-color: #DDD;
+	-fx-border-style: solid;
+	-fx-border-width: 2px;
+	-fx-text-fill: #BBB;
 }
+.deleteButton:hover{
+	-fx-border-color: #BBB;
+}
+
 .unreadMessage{
 	/*
 	-fx-background-color: #db8808;
@@ -176,8 +194,11 @@
     -fx-background-color: #404040;
 }
 
-.tree-cell:hovered{
+.tree-cell:hover{
 	-fx-font-weight: bold;
+}
+.tree-view .arrow{
+	-fx-background-color: #FFF;
 }
 .tree-view .scroll-bar:vertical{
 -fx-background-color: #000;

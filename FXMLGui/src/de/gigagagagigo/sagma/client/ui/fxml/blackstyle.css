@@ -2,6 +2,31 @@
 	-fx-background-color: #000;
 }
 
+/*ScrollBars */
+.scroll-bar:vertical .track,
+.scroll-bar:horizontal .track{
+	-fx-background-color: transparent;
+	-fx-border-color: transparent;
+	-fx-background-radius: 0;
+	-fx-border-radius: 2px;
+}
+.scroll-bar:vertical .increment-button,
+.scroll-bar:vertical .decrement-button{
+	-fx-background-color: transparent;
+	-fx-background-radius: 0;
+	-fx-padding: 0 10 0 0;
+}
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow{
+	-fx-shape: " ";
+	-fx-padding: 0;
+}
+.scroll-bar .thumb{
+	-fx-background-color: derive(#000, 90%);
+	-fx-background-insets: 2, 0, 0;
+	-fx-background-radius: 2px;
+}
+
 
 #activeChatsLabelPane, #userLabelPane, #menuBar, #messageOptionPane{
 	-fx-background-color:
@@ -77,6 +102,14 @@
 #sendPane .content{
 	-fx-background-color: #454545;
 	-fx-border-width:0,0,0,0;
+}
+
+#sendTextArea{
+	-fx-text-fill: #FFF;
+}
+
+.sendNoPartner{
+	-fx-border-color: #F00;
 }
 
 #messageOptionPane{

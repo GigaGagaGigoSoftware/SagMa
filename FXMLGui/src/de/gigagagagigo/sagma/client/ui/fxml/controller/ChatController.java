@@ -82,7 +82,8 @@ public class ChatController {
 
 		userTree.setOnMouseClicked((e) -> {
 			if (e.getClickCount() == 2 && userTree.getSelectionModel().getSelectedItem().getValue() != null
-					&& userTree.getSelectionModel().getSelectedItem().isLeaf()) {
+					&& userTree.getSelectionModel().getSelectedItem().isLeaf()
+					&& !userTree.getSelectionModel().getSelectedItem().getValue().equals("Users")) {
 				String selected = userTree.getSelectionModel().getSelectedItem().getValue();
 
 				openChatPane(getChatPane(selected), selected);
@@ -93,10 +94,12 @@ public class ChatController {
 			@Override
 			public void changed(ObservableValue<? extends ActiveChatCell> observable, ActiveChatCell oldPartner,
 					ActiveChatCell newPartner) {
-				if (!activeChats.isEmpty()) {
-					openChatPane(getChatPane(newPartner.getPartner()), newPartner.getPartner());
+				if (newPartner != null) {
+					if (!activeChats.isEmpty()) {
+						openChatPane(getChatPane(newPartner.getPartner()), newPartner.getPartner());
+					}
+					newPartner.changeNewMessage(false);
 				}
-				newPartner.changeNewMessage(false);
 			}
 		});
 
@@ -124,6 +127,7 @@ public class ChatController {
 			public void run() {
 				activeChatsList.scrollTo(getActiveChatCell(partner));
 				activeChatsList.getSelectionModel().select(getActiveChatCell(partner));
+				sendTextArea.getStyleClass().remove("sendNoPartner");
 			}
 		});
 	}
@@ -167,7 +171,6 @@ public class ChatController {
 
 	public void sendMessage() {
 		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
-			sendTextArea.setStyle(" -fx-border-color: blue;");
 			String partner = activeChatsList.getSelectionModel().getSelectedItem().getPartner();
 
 			String text = sendTextArea.getText();
@@ -182,7 +185,7 @@ public class ChatController {
 				getChatPane(partner).appendOwnMessage(text);
 			}
 		} else {
-			sendTextArea.setStyle(" -fx-border-color: red;");
+			sendTextArea.getStyleClass().add("sendNoPartner");
 		}
 	}
 

@@ -40,6 +40,8 @@ public class LogInController {
 		usernameLabel.setText(bundle.getString("user"));
 		okButton.setText(bundle.getString("login"));
 		cancelButton.setText(bundle.getString("cancel"));
+		okButton.setPrefWidth(cancelButton.getWidth());
+		okButton.prefWidthProperty().bind(cancelButton.prefWidthProperty());
 	}
 
 	public void setLoginStage(Stage loginStage) {

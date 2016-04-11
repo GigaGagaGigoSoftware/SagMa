@@ -116,6 +116,10 @@
 #sendTextArea{
 	-fx-text-fill: #FFF;
 }
+#sendTextArea:focused{
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
 
 .sendNoPartner{
 	-fx-border-color: #F00;
@@ -149,7 +153,12 @@
 	-fx-background-color: #333;
 	-fx-text-fill: #FFF;
 }
-
+.list-cell .button{
+	-fx-padding: 0;
+}
+.list-cell{
+	-fx-cell-size: 30;
+}
 .list-cell:even{
 	-fx-background-color: #555;
 }
@@ -209,8 +218,18 @@
 }
 
 
-
-
+/*Login Stage */
+#loginMainPane{
+	-fx-background-color: #444;
+}
+#okButton, #cancelButton{
+	-fx-background-color:
+		linear-gradient(#2E1300 0%, #733000 50%, #2E1300 100%);
+	-fx-text-fill: #FFF;
+}
+#loginMainPage .label{
+	
+}
 
 
 

@@ -69,6 +69,7 @@ public class Main extends Application {
 			loginStage.initModality(Modality.WINDOW_MODAL);
 			loginStage.initOwner(primaryStage);
 			Scene scene = new Scene(root);
+			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
 			loginStage.setScene(scene);
 
 			LogInController controller = loader.getController();

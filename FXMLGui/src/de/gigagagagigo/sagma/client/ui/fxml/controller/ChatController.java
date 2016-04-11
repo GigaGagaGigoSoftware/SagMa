@@ -20,6 +20,8 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -289,13 +291,14 @@ public class ChatController {
 			super();
 			this.button = button;
 			this.partner = partner;
+			this.setMaxHeight(10);
 			lPartner = new Label(partner);
 			lPartner.setMaxWidth(Double.MAX_VALUE);
 			lPartner.getStyleClass().add("unreadMessage");
 			HBox.setHgrow(lPartner, Priority.ALWAYS);
 			button.setText("X");
 			button.getStyleClass().add("deleteButton");
-			button.setMaxHeight(10);
+			button.prefWidthProperty().bind(button.heightProperty());
 
 			ft = new FadeTransition(Duration.millis(800), lPartner);
 			ft.setFromValue(1.0);
@@ -308,7 +311,7 @@ public class ChatController {
 		}
 
 		public void changeNewMessage(boolean isNew) {
-			if (isNew) {
+	 		if (isNew) {
 				lPartner.getStyleClass().add("unreadMessage");
 				ft.play();
 			} else {

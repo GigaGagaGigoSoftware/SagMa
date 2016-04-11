@@ -103,10 +103,7 @@ public class ChatController {
 
 	}
 
-	/**
-	 * TODO Open the Chatpane
-	 *
-	 */
+
 	private void openChatPane(ChatPane pane, String partner) {
 //		messagePane = pane;
 //		messagePane.getChildren().clear();
@@ -184,13 +181,6 @@ public class ChatController {
 		}
 	}
 
-	/**
-	 * TODO Update
-	 */
-
-	private void updateUserTree() {
-		sendPacket(new UserListRequestPacket());
-	}
 
 	/**
 	 * PacketHandler

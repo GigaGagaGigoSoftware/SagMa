@@ -1,12 +1,12 @@
 #mainPane, .split-pane{
-	-fx-background-color: #000;
+	-fx-background-color: #FFF;
 }
 
 /*ScrollBars */
 .scroll-bar{
 	-fx-background-color: transparent;
-	-fx-background-color: #424242;
-	-fx-border-color: #424242;
+	-fx-background-color: #E9EDF8;
+	-fx-border-color: #E9EDF8;
 }
 .scroll-bar:vertical .track,
 .scroll-bar:horizontal .track{
@@ -33,41 +33,40 @@
 }
 .scroll-bar:hover .thumb,
 .scroll-bar .thumb:pressed{
-	-fx-background-color: derive(#000, 90%);
+	-fx-background-color: derive(#FFF, 90%);
 }
 
 
 #activeChatsLabelPane, #userLabelPane, #menuBar, #messageOptionPane{
 	-fx-background-color:
-		linear-gradient(#2E1300 0%, #733000 50%, #2E1300 100%);
+		linear-gradient(#6897BB 0%, #96CDCD 100%);
 	-fx-background-insets:0.0;
 	-fx-background-radius: 0 0 8 8;
 }
 
 .split-pane > .split-pane-divider{
-	-fx-background-color:
-		linear-gradient(#686868 0%, #232723 25%, #373837 75%, #757575 100%),
-        linear-gradient(#020b02, #3a3a3a),
-        linear-gradient(#9d9e9d 0%, #6b6a6b 20%, #343534 80%, #242424 100%),
-        linear-gradient(#8a8a8a 0%, #6b6a6b 20%, #343534 80%, #262626 100%),
-        linear-gradient(#777777 0%, #606060 50%, #505250 51%, #2a2b2a 100%);
+	-fx-background-color: #3F63C4;
     -fx-background-insets: 0,1,4,5,6;
    	-fx-background-radius: 9,8,5,4,3;
 }
 
 /*menu */
 .label, #menuBar{
-	-fx-text-fill: white;
+	-fx-text-fill: #2A52BE;
 }
 
 /*Messageregion */
 
 #messagePane{
-	-fx-background-color: #323232;
+	-fx-background-color: #E9EDF8;
+	-fx-background-image: url("img/unicorn.jpg");
+    -fx-background-repeat: stretch;
+    -fx-background-size: 236 236;
+    -fx-background-position: center center;
 }
 
 #chatPane{
-	-fx-background-color: #424242;
+	-fx-background-color: #E9EDF8;
 	-fx-spacing: 5px;
 	-fx-padding: 5 0 0 0;
 	-fx-focus-color: transparent;
@@ -89,6 +88,7 @@
 .ownMessagePane, .partnerMessagePane{
 	-fx-background-radius: 8;
 	-fx-padding: 5px;
+	-fx-text-fill: #2A52BE;
 }
 
 .authorLabel{
@@ -97,24 +97,24 @@
 }
 
 .ownMessagePane{
-	-fx-background-color: #702400;
+	-fx-background-color: #A9B9E5;
 }
 .partnerMessagePane{
-	-fx-background-color: #777;
+	-fx-background-color: #FFF68F;
 }
 
 
 #sendPane{
-	-fx-background-color:#000;
+	-fx-background-color:#FFF;
 }
 
 #sendPane .content{
-	-fx-background-color: #454545;
+	-fx-background-color: #E9EDF8;
 	-fx-border-width:0,0,0,0;
 }
 
 #sendTextArea{
-	-fx-text-fill: #FFF;
+	-fx-text-fill: #2A52BE;
 }
 #sendTextArea:focused{
 	-fx-focus-color: transparent;
@@ -134,7 +134,7 @@
 	-fx-pref-height: Infinity;
 
   -fx-background-color:
-  	linear-gradient(#121212 0%, #727272 50%, #121212 100%);
+  	linear-gradient(#6985D1 0%, #BFCBEB 50%, #6985D1 100%);
   -fx-border-radius: 5;
   -fx-font-size: 20px;
   -fx-text-alignment:center;
@@ -144,14 +144,14 @@
 
 #bSend:hover {
 	-fx-background-color:
-		linear-gradient(#000000 0%, #565656 50%, #000000 100%);
+		linear-gradient(#5874C0 0%, #AEBADA 50%, #5874C0 100%);
 }
 
 /*chatoptionregion */
 
 #activeChatsList, #userTree{
-	-fx-background-color: #333;
-	-fx-text-fill: #FFF;
+	-fx-background-color: #E9EDF8;
+	-fx-text-fill: #2A52BE;
 }
 .list-cell .button{
 	-fx-padding: 0;
@@ -160,10 +160,10 @@
 	-fx-cell-size: 30;
 }
 .list-cell:even{
-	-fx-background-color: #555;
+	-fx-background-color: #FFF;
 }
 .list-cell:odd{
-	-fx-background-color: #454545;
+	-fx-background-color: #D4DCF2;
 }
 .list-cell:filled:hover{
 
@@ -177,7 +177,7 @@
 	-fx-border-color: #DDD;
 	-fx-border-style: solid;
 	-fx-border-width: 2px;
-	-fx-text-fill: #BBB;
+	-fx-text-fill: #214198;
 }
 .deleteButton:hover{
 	-fx-border-color: #BBB;
@@ -192,29 +192,29 @@
 
 
 #userTree .tree-cell{
-	-fx-background-color: #333;
-	-fx-text-fill: #FFF;
+	-fx-background-color: #E9EDF8;
+	-fx-text-fill: #2A52BE;
 }
 
 .tree-cell {
     -fx-padding: 0.75em 0em 0.75em 0em ;
 }
 .tree-cell:expanded, .tree-cell:sub-tree-item {
-    -fx-background-color: #404040;
+    -fx-background-color: #D4DCF2;
 }
 
 .tree-cell:hover{
 	-fx-font-weight: bold;
 }
 .tree-view .arrow{
-	-fx-background-color: #FFF;
+	-fx-background-color: #94A8DE;
 }
 .tree-view .scroll-bar:vertical{
--fx-background-color: #000;
+-fx-background-color: #FFF;
 }
 
 .tree-view .scroll-bar:horizontal{
--fx-background-color: #000;
+-fx-background-color: #FFF;
 }
 
 

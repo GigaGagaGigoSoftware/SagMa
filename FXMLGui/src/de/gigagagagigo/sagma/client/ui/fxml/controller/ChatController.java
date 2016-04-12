@@ -1,5 +1,6 @@
 package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -30,6 +31,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -76,6 +79,7 @@ public class ChatController {
 
 	@FXML
 	private void initialize() {
+
 		resources = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat",
 				new Locale("en", "EN"));
 

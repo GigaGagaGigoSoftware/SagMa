@@ -2,6 +2,8 @@
 	-fx-background-color: #000;
 }
 
+
+
 /*ScrollBars */
 .scroll-bar{
 	-fx-background-color: transparent;
@@ -55,10 +57,17 @@
    	-fx-background-radius: 9,8,5,4,3;
 }
 
-/*menu */
+/* Menu */
 .label, #menuBar{
 	-fx-text-fill: white;
 }
+.menu:showing, .menu:hover, .menu-item:hover, .menu-item:focused{
+	-fx-background-color: rgba(100, 100, 100, 0.3);
+}
+.context-menu{
+	-fx-background-color: rgba(150, 150, 150, 0.4);
+}
+
 
 /*Messageregion */
 

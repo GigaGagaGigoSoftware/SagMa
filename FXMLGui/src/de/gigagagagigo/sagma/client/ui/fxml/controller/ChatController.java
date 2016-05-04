@@ -1,6 +1,6 @@
 package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
+import de.gigagagagigo.sagma.client.ui.fxml.Main;
 import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packets.ChatMessagePacket;
 import de.gigagagagigo.sagma.packets.UserListReplyPacket;
@@ -20,9 +21,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -31,18 +33,19 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class ChatController {
 
 	private String username;
 	private SagMaClient client;
+	private static ResourceBundle language;
 	private final Map<String, ChatPane> chats = new HashMap<String, ChatPane>();
 	private final ObservableList<String> activeChats = FXCollections.observableArrayList();
 	private final ObservableList<ActiveChatCell> activeChatsCells = FXCollections.observableArrayList();
@@ -75,6 +78,8 @@ public class ChatController {
 		this.client = client;
 		this.client.setPacketHandler(this::handlePacket);
 		this.username = username;
+		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat",
+				new Locale("en", "EN"));
 	}
 
 	@FXML
@@ -280,6 +285,72 @@ public class ChatController {
 
 	}
 
+	/*
+	 * Menu
+	 */
+
+	public void close() {
+		Platform.exit();
+	}
+
+	public void changeLanguage(ActionEvent e) {
+		Locale locale = new Locale("en", "EN");
+		switch (((MenuItem) e.getSource()).getText()) {
+
+		case "DE":
+			locale = new Locale("de", "DE");
+			break;
+		case "EN":
+			locale = new Locale("en", "EN");
+			break;
+		case "RU":
+			locale = new Locale("ru", "RU");
+			break;
+		}
+		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat", locale);
+		activeChatsLabel.setText(language.getString("activeList"));
+		userLabel.setText(language.getString("userList"));
+		bSend.setText(language.getString("sendButton"));
+		mSagMa.setText(language.getString("mSagMa"));
+		mHelp.setText(language.getString("mHelp"));
+		miClose.setText(language.getString("miClose"));
+		miChangeLanguage.setText(language.getString("miLanguage"));
+		miOptions.setText(language.getString("miOptions"));
+		miAbout.setText(language.getString("miAbout"));
+		miTerms.setText(language.getString("miTerms"));
+		userTreeItem.setValue(language.getString("users"));
+
+	}
+
+	public void showAbout() {
+		FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/About.fxml"));
+		showNewWindow(loader);
+	}
+
+	public void showTerms() {
+		FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/About.fxml"));
+		showNewWindow(loader);
+
+	}
+
+	private void showNewWindow(FXMLLoader loader) {
+		try {
+			loader.setController(new InfoController());
+			loader.setResources(language);
+			AnchorPane root = loader.load();
+			Stage aboutStage = new Stage();
+			aboutStage.initModality(Modality.WINDOW_MODAL);
+			aboutStage.initOwner(messagePane.getScene().getWindow());
+			InfoController controller = loader.getController();
+			controller.setStage(aboutStage);
+			Scene scene = new Scene(root, 400, 300);
+			aboutStage.setScene(scene);
+			aboutStage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * ListItem for active Chats It contains a region for showing that unread
 	 * messages exists, a label for the partner and a delete button
@@ -315,7 +386,7 @@ public class ChatController {
 		}
 
 		public void changeNewMessage(boolean isNew) {
-	 		if (isNew) {
+			if (isNew) {
 				lPartner.getStyleClass().add("unreadMessage");
 				ft.play();
 			} else {

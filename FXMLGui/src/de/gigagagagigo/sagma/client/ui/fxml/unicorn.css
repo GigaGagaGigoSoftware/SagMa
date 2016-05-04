@@ -58,7 +58,7 @@
 /*Messageregion */
 
 #messagePane{
-	-fx-background-color: #E9EDF8;
+	-fx-background-color: #FFF;
 	-fx-background-image: url("img/unicorn.jpg");
     -fx-background-repeat: stretch;
     -fx-background-size: 236 236;

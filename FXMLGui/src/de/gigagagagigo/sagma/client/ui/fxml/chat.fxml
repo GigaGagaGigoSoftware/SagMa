@@ -25,24 +25,27 @@
 			<menus>
 				<Menu fx:id="mSagMa" mnemonicParsing="false" text="%mSagMa">
 					<items>
-						<MenuItem fx:id="miChangeLanguage" mnemonicParsing="false"
-							text="%miLanguage" />
+						<Menu fx:id="miChangeLanguage" mnemonicParsing="false"
+							text="%miLanguage" >
+								<MenuItem text="EN" onAction="#changeLanguage" />
+								<MenuItem text="DE" onAction="#changeLanguage"/>
+								<MenuItem text="RU" onAction="#changeLanguage"/>
+						</Menu>
 						<MenuItem fx:id="miOptions" mnemonicParsing="false" text="%miOptions" />
 						<!-- <MenuItem fx:id="miNameChange" mnemonicParsing="false" text="%miNameChange"
 							/> <MenuItem fx:id="miStatus" mnemonicParsing="false" text="%miStatus" />
 							<MenuItem fx:id="miLogOut" mnemonicParsing="false" text="%miLogOut" /> -->
-						<MenuItem fx:id="miClose" mnemonicParsing="false" text="%miClose" />
+						<MenuItem fx:id="miClose" mnemonicParsing="false" text="%miClose" onAction="#close"/>
 					</items>
 				</Menu>
 				<!-- <Menu fx:id="mActions" mnemonicParsing="false" text="%mActions">
 					<items> </items> </Menu> -->
 				<Menu fx:id="mHelp" mnemonicParsing="false" text="%mHelp">
 					<items>
-						<MenuItem fx:id="miAbout" mnemonicParsing="false" text="%miAbout" />
-						<MenuItem fx:id="miTerms" mnemonicParsing="false" text="%miTerms" />
+						<MenuItem fx:id="miAbout" mnemonicParsing="false" text="%miAbout" onAction="#showAbout"/>
+						<MenuItem fx:id="miTerms" mnemonicParsing="false" text="%miTerms" onAction="#showTerms"/>
 					</items>
 				</Menu>
-
 			</menus>
 		</MenuBar>
 	</top>
@@ -106,7 +109,7 @@
 												<HBox id="activeChatsLabelPane" alignment="CENTER"
 													BorderPane.alignment="CENTER">
 													<children>
-														<Label id="activeChatsLabel" text="%activeList" />
+														<Label fx:id="activeChatsLabel" text="%activeList" />
 													</children>
 												</HBox>
 											</top>
@@ -126,7 +129,7 @@
 												<HBox id="userLabelPane" alignment="CENTER"
 													BorderPane.alignment="CENTER">
 													<children>
-														<Label id="userLabel" alignment="CENTER"
+														<Label fx:id="userLabel" alignment="CENTER"
 															contentDisplay="CENTER" text="%userList" />
 													</children>
 												</HBox>

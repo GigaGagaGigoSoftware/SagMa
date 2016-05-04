@@ -50,7 +50,7 @@ public class Main extends Application {
 			loader.setResources(language);
 			BorderPane root = loader.load();
 			Scene scene = new Scene(root, 550, 550);
-			scene.getStylesheets().add(Main.class.getResource("unicorn.css").toExternalForm());
+			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
 			primaryStage.setScene(scene);
 
 			primaryStage.show();

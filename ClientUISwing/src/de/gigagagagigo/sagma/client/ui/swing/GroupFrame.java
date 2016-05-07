@@ -8,21 +8,25 @@ import java.awt.event.WindowEvent;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
-import de.gigagagagigo.sagma.packets.MessagePacket;
-import de.gigagagagigo.sagma.packets.SendMessagePacket;
+import de.gigagagagigo.sagma.packets.*;
 
-public class ChatFrame extends JFrame {
+public class GroupFrame extends JFrame {
 
 	private final WindowManager manager;
-	private final String partner;
+	private final String group;
+
+	private DefaultListModel<String> membersModel = new DefaultListModel<>();
+	private JList<String> members = new JList<>(membersModel);
 
 	private JTextPane chat = new JTextPane();
 	private JTextField text = new JTextField();
 	private JButton send = new JButton("Senden");
 
-	public ChatFrame(WindowManager manager, String partner) {
+	public GroupFrame(WindowManager manager, String group) {
 		this.manager = manager;
-		this.partner = partner;
+		this.group = group;
+
+		members.setPreferredSize(new Dimension(200, 200));
 
 		chat.setEditable(false);
 		text.addActionListener(e -> sendMessage());
@@ -32,9 +36,14 @@ public class ChatFrame extends JFrame {
 		controls.add(text, BorderLayout.CENTER);
 		controls.add(send, BorderLayout.EAST);
 
+		JPanel chatPanel = new JPanel(new BorderLayout(5, 5));
+		chatPanel.add(new JScrollPane(chat), BorderLayout.CENTER);
+		chatPanel.add(controls, BorderLayout.SOUTH);
+
 		JPanel content = new JPanel(new BorderLayout(5, 5));
-		content.add(new JScrollPane(chat), BorderLayout.CENTER);
-		content.add(controls, BorderLayout.SOUTH);
+		content.add(chatPanel, BorderLayout.CENTER);
+		content.add(new JScrollPane(members), BorderLayout.EAST);
+
 
 		content.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(content);
@@ -43,13 +52,13 @@ public class ChatFrame extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				dispose();
-				manager.closeChatFrame(partner);
+				manager.closeGroupFrame(group);
 			}
 		});
 
-		setTitle(partner + " - SagMa [" + manager.getUsername() + "]");
-		setSize(500, 700);
-		setMinimumSize(new Dimension(200, 300));
+		setTitle(group + " - SagMa [" + manager.getUsername() + "]");
+		setSize(700, 700);
+		setMinimumSize(new Dimension(400, 300));
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
@@ -59,8 +68,8 @@ public class ChatFrame extends JFrame {
 		text.setText("");
 
 		SendMessagePacket message = new SendMessagePacket();
-		message.entityName = partner;
-		message.isGroup = false;
+		message.entityName = group;
+		message.isGroup = true;
 		message.content = messageText;
 		manager.sendPacket(message);
 
@@ -75,6 +84,15 @@ public class ChatFrame extends JFrame {
 		String text = chat.getText();
 		text += author + ": " + message + "\n";
 		chat.setText(text);
+	}
+
+	public void handleMemberListUpdate(MemberListUpdatePacket update) {
+		if (update.removed != null)
+			for (String user : update.removed)
+				membersModel.removeElement(user);
+		if (update.added != null)
+			for (String user : update.added)
+				membersModel.addElement(user);
 	}
 
 }

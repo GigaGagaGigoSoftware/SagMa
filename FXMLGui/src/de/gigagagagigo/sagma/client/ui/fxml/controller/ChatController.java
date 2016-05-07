@@ -7,7 +7,7 @@ import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
 import de.gigagagagigo.sagma.client.ui.fxml.Main;
 import de.gigagagagigo.sagma.packet.Packet;
-import de.gigagagagigo.sagma.packets.ChatMessagePacket;
+import de.gigagagagigo.sagma.packets.MessagePacket;
 import de.gigagagagigo.sagma.packets.UserListUpdatePacket;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -173,9 +173,9 @@ public class ChatController {
 			sendTextArea.setText("");
 
 			if (!text.trim().equals("")) {
-				ChatMessagePacket message = new ChatMessagePacket();
-				message.username = partner;
-				message.message = text;
+				MessagePacket message = new MessagePacket();
+				message.userName = partner;
+				message.content = text;
 				sendPacket(message);
 
 				getChatPane(partner).appendOwnMessage(text);
@@ -197,19 +197,19 @@ public class ChatController {
 		if (packet instanceof UserListUpdatePacket) {
 			UserListUpdatePacket update = (UserListUpdatePacket) packet;
 			Platform.runLater(() -> handleUserListUpdate(update));
-		} else if (packet instanceof ChatMessagePacket) {
-			ChatMessagePacket message = (ChatMessagePacket) packet;
+		} else if (packet instanceof MessagePacket) {
+			MessagePacket message = (MessagePacket) packet;
 			Platform.runLater(() -> newMessage(message));
 		}
 	}
 
-	private void newMessage(ChatMessagePacket message) {
-		getChatPane(message.username).handleChatMessage(message);
+	private void newMessage(MessagePacket message) {
+		getChatPane(message.userName).handleChatMessage(message);
 
 		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
-			if (!activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(message.username)) {
+			if (!activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(message.userName)) {
 				for (ActiveChatCell cell : activeChatsList.getItems()) {
-					if (cell.getPartner().equals(message.username)) {
+					if (cell.getPartner().equals(message.userName)) {
 						cell.changeNewMessage(true);
 					}
 				}

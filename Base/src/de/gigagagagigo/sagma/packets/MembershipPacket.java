@@ -4,21 +4,21 @@ import java.io.IOException;
 
 import de.gigagagagigo.sagma.packet.*;
 
-public class ChatMessagePacket implements Packet {
+public class MembershipPacket implements Packet {
 
-	public String username;
-	public String message;
+	public String groupName;
+	public boolean leave;
 
 	@Override
 	public void read(PacketDataInputStream in) throws IOException {
-		username = in.readString();
-		message = in.readString();
+		groupName = in.readString();
+		leave = in.readBoolean();
 	}
 
 	@Override
 	public void write(PacketDataOutputStream out) throws IOException {
-		out.writeString(username);
-		out.writeString(message);
+		out.writeString(groupName);
+		out.writeBoolean(leave);
 	}
 
 }

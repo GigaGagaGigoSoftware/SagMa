@@ -1,6 +1,6 @@
 package de.gigagagagigo.sagma.client.ui.fxml;
 
-import de.gigagagagigo.sagma.packets.ChatMessagePacket;
+import de.gigagagagigo.sagma.packets.MessagePacket;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -40,8 +40,8 @@ public class ChatPane extends ScrollPane {
 		timer.stop();
 	}
 
-	public void handleChatMessage(ChatMessagePacket message) {
-		appendMessage(message.username, message.message);
+	public void handleChatMessage(MessagePacket message) {
+		appendMessage(message.userName, message.content);
 	}
 
 	public void appendMessage(String author, String message) {

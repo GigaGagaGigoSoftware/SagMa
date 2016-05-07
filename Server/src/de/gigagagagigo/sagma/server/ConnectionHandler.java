@@ -69,6 +69,9 @@ public class ConnectionHandler implements Runnable {
 			UserListUpdatePacket update = new UserListUpdatePacket();
 			update.added = getCustomUserList();
 			out.write(update);
+			GroupListUpdatePacket groupUpdate = new GroupListUpdatePacket();
+			groupUpdate.added = server.getGroups();
+			out.write(groupUpdate);
 		} else {
 			out.write(new DisconnectPacket());
 		}
@@ -79,8 +82,10 @@ public class ConnectionHandler implements Runnable {
 	private void listen() throws IOException {
 		while (true) {
 			Packet packet = in.read();
-			if (packet instanceof ChatMessagePacket) {
-				handleChatMessage((ChatMessagePacket) packet);
+			if (packet instanceof SendMessagePacket) {
+				handleMessage((SendMessagePacket) packet);
+			} else if (packet instanceof MembershipPacket) {
+				handleMembership((MembershipPacket) packet);
 			} else if (packet instanceof DisconnectPacket) {
 				server.removeHandler(username);
 				username = null;
@@ -92,8 +97,18 @@ public class ConnectionHandler implements Runnable {
 		}
 	}
 
-	private void handleChatMessage(ChatMessagePacket chatMessage) {
-		server.sendMessage(this.username, chatMessage.username, chatMessage.message);
+	private void handleMessage(SendMessagePacket message) {
+		if (message.isGroup)
+			server.sendMessageToGroup(this.username, message.entityName, message.content);
+		else
+			server.sendMessage(this.username, message.entityName, message.content);
+	}
+
+	private void handleMembership(MembershipPacket membership) {
+		if (membership.leave)
+			server.removeFromGroup(this, membership.groupName);
+		else
+			server.addToGroup(this, membership.groupName);
 	}
 
 	private String[] getCustomUserList() {
@@ -117,11 +132,8 @@ public class ConnectionHandler implements Runnable {
 		}
 	}
 
-	public void sendMessage(String username, String message) {
-		ChatMessagePacket packet = new ChatMessagePacket();
-		packet.username = username;
-		packet.message = message;
-		queue.add(packet);
+	public String getUserName() {
+		return username;
 	}
 
 	public void sendPacket(Packet packet) {

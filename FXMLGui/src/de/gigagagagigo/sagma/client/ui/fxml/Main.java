@@ -7,8 +7,8 @@ import java.util.ResourceBundle;
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.controller.ChatController;
 import de.gigagagagigo.sagma.client.ui.fxml.controller.LogInController;
-import de.gigagagagigo.sagma.packets.LogInReplyPacket;
-import de.gigagagagigo.sagma.packets.LogInRequestPacket;
+import de.gigagagagigo.sagma.packets.AuthReplyPacket;
+import de.gigagagagigo.sagma.packets.AuthRequestPacket;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -22,7 +22,7 @@ public class Main extends Application {
 
 	private Stage primaryStage;
 	private String username, server;
-	private LogInRequestPacket request;
+	private AuthRequestPacket request;
 	private static ResourceBundle language;
 
 	public static void main(String[] args) {

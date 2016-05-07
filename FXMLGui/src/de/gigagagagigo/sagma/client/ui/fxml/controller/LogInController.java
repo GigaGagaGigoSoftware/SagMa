@@ -4,13 +4,11 @@ import java.util.ResourceBundle;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.Main;
-import de.gigagagagigo.sagma.packets.LogInReplyPacket;
-import de.gigagagagigo.sagma.packets.LogInRequestPacket;
+import de.gigagagagigo.sagma.packets.AuthReplyPacket;
+import de.gigagagagigo.sagma.packets.AuthRequestPacket;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 public class LogInController {
@@ -20,6 +18,8 @@ public class LogInController {
 	@FXML
 	private TextField tfUsername;
 	@FXML
+	private PasswordField pfPassword;
+	@FXML
 	private Button okButton;
 	@FXML
 	private Button cancelButton;
@@ -27,11 +27,12 @@ public class LogInController {
 	private Label serverLabel;
 	@FXML
 	private Label usernameLabel;
+	@FXML private Label passwordLabel;
 
 	private Stage loginStage;
 	private boolean okClicked = false;
 	private String username, server;
-	private LogInRequestPacket request;
+	private AuthRequestPacket request;
 
 	@FXML
 	private void initialize(ResourceBundle resources) {
@@ -60,8 +61,8 @@ public class LogInController {
 
 			SagMaClient client = new SagMaClient();
 			client.setPacketHandler(p -> {
-				if (p instanceof LogInReplyPacket) {
-					LogInReplyPacket reply = (LogInReplyPacket) p;
+				if (p instanceof AuthReplyPacket) {
+					AuthReplyPacket reply = (AuthReplyPacket) p;
 					if (reply.success) {
 						Platform.runLater(()->{
 							this.closeWindow();
@@ -75,8 +76,10 @@ public class LogInController {
 				}
 			});
 			client.start(tfServer.getText());
-			request = new LogInRequestPacket();
-			request.username = tfUsername.getText();;
+			request = new AuthRequestPacket();
+			request.username = tfUsername.getText();
+			request.password = pfPassword.getText();
+			request.register = false;
 			client.sendPacket(request);
 		}
 	}

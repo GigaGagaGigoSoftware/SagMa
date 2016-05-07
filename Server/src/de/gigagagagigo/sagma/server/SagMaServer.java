@@ -12,6 +12,7 @@ public class SagMaServer implements Runnable {
 
 	private static final String[] STRING_ARRAY = new String[0];
 
+	private final Authenticator authenticator = new Authenticator();
 	private final ConnectionPoint connectionPoint;
 	private final Map<String, ConnectionHandler> activeHandlers;
 
@@ -43,19 +44,22 @@ public class SagMaServer implements Runnable {
 		}
 	}
 
-	public synchronized boolean register(String username, ConnectionHandler handler) {
-		if (!activeHandlers.containsKey(username)) {
+	public synchronized boolean addHandler(String username, String password, boolean register,
+		ConnectionHandler handler) {
+		if (activeHandlers.containsKey(username))
+			return false;
+		boolean success = register ? authenticator.register(username, password)
+			: authenticator.logIn(username, password);
+		if (success) {
 			UserListUpdatePacket update = new UserListUpdatePacket();
 			update.added = new String[] { username };
 			activeHandlers.values().forEach(h -> h.sendPacket(update));
 			activeHandlers.put(username, handler);
-			return true;
-		} else {
-			return false;
 		}
+		return success;
 	}
 
-	public synchronized void unregister(String username) {
+	public synchronized void removeHandler(String username) {
 		if (username != null && activeHandlers.containsKey(username)) {
 			activeHandlers.remove(username);
 			UserListUpdatePacket update = new UserListUpdatePacket();

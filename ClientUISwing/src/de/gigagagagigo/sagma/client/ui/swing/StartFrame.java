@@ -2,31 +2,33 @@ package de.gigagagagigo.sagma.client.ui.swing;
 
 import static javax.swing.GroupLayout.*;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.EmptyBorder;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
-import de.gigagagagigo.sagma.packets.LogInReplyPacket;
-import de.gigagagagigo.sagma.packets.LogInRequestPacket;
+import de.gigagagagigo.sagma.packets.AuthReplyPacket;
+import de.gigagagagigo.sagma.packets.AuthRequestPacket;
 
-public class StartFrame extends JFrame implements ActionListener {
+public class StartFrame extends JFrame {
 
 	private JTextField server = new JTextField(20);
 	private JTextField username = new JTextField(20);
-	private JButton ok = new JButton("OK");
-	private LogInRequestPacket request;
+	private JPasswordField password = new JPasswordField(20);
+	private JButton logIn = new JButton("Einloggen");
+	private JButton register = new JButton("Registrieren");
+	private AuthRequestPacket request;
 
 	public StartFrame() {
-		server.addActionListener(this);
-		username.addActionListener(this);
-		ok.addActionListener(this);
+		server.addActionListener(e -> username.requestFocus());
+		username.addActionListener(e -> password.requestFocus());
+		password.addActionListener(e -> authenticate(false));
+		logIn.addActionListener(e -> authenticate(false));
+		register.addActionListener(e -> authenticate(true));
 
 		JLabel serverLabel = new JLabel("Server:");
 		JLabel usernameLabel = new JLabel("Benutzername:");
+		JLabel passwordLabel = new JLabel("Passwort:");
 
 		JPanel content = new JPanel();
 		setContentPane(content);
@@ -42,16 +44,25 @@ public class StartFrame extends JFrame implements ActionListener {
 			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
 				.addComponent(usernameLabel)
 				.addComponent(username))
-			.addComponent(ok));
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(passwordLabel)
+				.addComponent(password))
+			.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+				.addComponent(logIn)
+				.addComponent(register)));
 		layout.setHorizontalGroup(layout.createParallelGroup()
 			.addGroup(layout.createSequentialGroup()
 				.addGroup(layout.createParallelGroup()
 					.addComponent(serverLabel, Alignment.TRAILING)
-					.addComponent(usernameLabel, Alignment.TRAILING))
+					.addComponent(usernameLabel, Alignment.TRAILING)
+					.addComponent(passwordLabel, Alignment.TRAILING))
 				.addGroup(layout.createParallelGroup()
 					.addComponent(server)
-					.addComponent(username)))
-			.addComponent(ok, PREFERRED_SIZE, PREFERRED_SIZE, Integer.MAX_VALUE));
+					.addComponent(username)
+					.addComponent(password)))
+			.addGroup(layout.createSequentialGroup()
+				.addComponent(logIn, PREFERRED_SIZE, PREFERRED_SIZE, Integer.MAX_VALUE)
+				.addComponent(register, PREFERRED_SIZE, PREFERRED_SIZE, Integer.MAX_VALUE)));
 
 		pack();
 		setMinimumSize(getSize());
@@ -61,14 +72,14 @@ public class StartFrame extends JFrame implements ActionListener {
 		setVisible(true);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (ok.isEnabled()) {
-			ok.setEnabled(false);
+	private void authenticate(boolean doRegister) {
+		if (logIn.isEnabled()) {
+			logIn.setEnabled(false);
+			register.setEnabled(false);
 			SagMaClient client = new SagMaClient();
 			client.setPacketHandler(p -> {
-				if (p instanceof LogInReplyPacket) {
-					LogInReplyPacket reply = (LogInReplyPacket) p;
+				if (p instanceof AuthReplyPacket) {
+					AuthReplyPacket reply = (AuthReplyPacket) p;
 					if (reply.success) {
 						SwingUtilities.invokeLater(() -> dispose());
 						new WindowManager(client, request.username);
@@ -76,19 +87,25 @@ public class StartFrame extends JFrame implements ActionListener {
 						SwingUtilities.invokeLater(() -> {
 							JOptionPane.showMessageDialog(
 								this,
-								"Der Benutzername wird bereits verwendet.",
+								"Der Server hat die Anmeldedaten nicht akzeptiert.",
 								"Fehler!",
 								JOptionPane.ERROR_MESSAGE);
-							ok.setEnabled(true);
+							logIn.setEnabled(true);
+							register.setEnabled(true);
 						});
 					}
 				} else {
-					SwingUtilities.invokeLater(() -> ok.setEnabled(true));
+					SwingUtilities.invokeLater(() -> {
+						logIn.setEnabled(true);
+						register.setEnabled(true);
+					});
 				}
 			});
 			client.start(server.getText());
-			request = new LogInRequestPacket();
+			request = new AuthRequestPacket();
 			request.username = username.getText();
+			request.password = new String(password.getPassword());
+			request.register = doRegister;
 			client.sendPacket(request);
 		}
 	}

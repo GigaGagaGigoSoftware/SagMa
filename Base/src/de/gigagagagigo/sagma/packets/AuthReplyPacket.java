@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import de.gigagagagigo.sagma.packet.*;
 
-public class LogInReplyPacket implements Packet {
+public class AuthReplyPacket implements Packet {
 
 	public boolean success;
 

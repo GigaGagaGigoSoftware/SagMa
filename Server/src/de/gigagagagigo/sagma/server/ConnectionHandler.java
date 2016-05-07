@@ -36,13 +36,13 @@ public class ConnectionHandler implements Runnable {
 	@Override
 	public void run() {
 		try {
-			if (checkVersion() && logIn()) {
+			if (checkVersion() && authenticate()) {
 				listen();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
-			server.unregister(username);
+			server.removeHandler(username);
 			close();
 		}
 	}
@@ -57,18 +57,20 @@ public class ConnectionHandler implements Runnable {
 		return success;
 	}
 
-	private boolean logIn() throws IOException {
-		LogInRequestPacket request = in.read(LogInRequestPacket.class);
-		boolean success = server.register(request.username, this);
+	private boolean authenticate() throws IOException {
+		AuthRequestPacket request = in.read(AuthRequestPacket.class);
+		boolean success = server.addHandler(request.username, request.password, request.register, this);
 		if (success)
 			this.username = request.username;
-		LogInReplyPacket reply = new LogInReplyPacket();
+		AuthReplyPacket reply = new AuthReplyPacket();
 		reply.success = success;
 		out.write(reply);
 		if (success) {
 			UserListUpdatePacket update = new UserListUpdatePacket();
 			update.added = getCustomUserList();
 			out.write(update);
+		} else {
+			out.write(new DisconnectPacket());
 		}
 		new Thread(new Writer()).start();
 		return success;
@@ -82,7 +84,7 @@ public class ConnectionHandler implements Runnable {
 			} else if (packet instanceof UserListRequestPacket) {
 				handleUserListRequest((UserListRequestPacket) packet);
 			} else if (packet instanceof DisconnectPacket) {
-				server.unregister(username);
+				server.removeHandler(username);
 				username = null;
 				queue.add(new DisconnectPacket());
 				break;

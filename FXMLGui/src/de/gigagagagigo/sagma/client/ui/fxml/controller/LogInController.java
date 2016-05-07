@@ -64,6 +64,7 @@ public class LogInController {
 				if (p instanceof AuthReplyPacket) {
 					AuthReplyPacket reply = (AuthReplyPacket) p;
 					if (reply.success) {
+						client.setPacketHandler(null);
 						Platform.runLater(()->{
 							this.closeWindow();
 							Main.showChat(client, request.username);

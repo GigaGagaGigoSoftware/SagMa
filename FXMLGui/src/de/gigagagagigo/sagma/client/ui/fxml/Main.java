@@ -1,28 +1,22 @@
 package de.gigagagagigo.sagma.client.ui.fxml;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.controller.ChatController;
 import de.gigagagagigo.sagma.client.ui.fxml.controller.LogInController;
-import de.gigagagagigo.sagma.packets.AuthReplyPacket;
-import de.gigagagagigo.sagma.packets.AuthRequestPacket;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class Main extends Application {
 
 	private Stage primaryStage;
-	private String username, server;
-	private AuthRequestPacket request;
 	private static ResourceBundle language;
 
 	public static void main(String[] args) {

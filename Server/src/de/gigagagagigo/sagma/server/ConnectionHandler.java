@@ -81,8 +81,6 @@ public class ConnectionHandler implements Runnable {
 			Packet packet = in.read();
 			if (packet instanceof ChatMessagePacket) {
 				handleChatMessage((ChatMessagePacket) packet);
-			} else if (packet instanceof UserListRequestPacket) {
-				handleUserListRequest((UserListRequestPacket) packet);
 			} else if (packet instanceof DisconnectPacket) {
 				server.removeHandler(username);
 				username = null;
@@ -96,12 +94,6 @@ public class ConnectionHandler implements Runnable {
 
 	private void handleChatMessage(ChatMessagePacket chatMessage) {
 		server.sendMessage(this.username, chatMessage.username, chatMessage.message);
-	}
-
-	private void handleUserListRequest(UserListRequestPacket request) throws IOException {
-		UserListReplyPacket reply = new UserListReplyPacket();
-		reply.users = getCustomUserList();
-		queue.add(reply);
 	}
 
 	private String[] getCustomUserList() {

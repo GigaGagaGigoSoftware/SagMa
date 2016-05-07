@@ -1,18 +1,13 @@
 package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
 import de.gigagagagigo.sagma.client.ui.fxml.Main;
 import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packets.ChatMessagePacket;
-import de.gigagagagigo.sagma.packets.UserListReplyPacket;
-import de.gigagagagigo.sagma.packets.UserListRequestPacket;
 import de.gigagagagigo.sagma.packets.UserListUpdatePacket;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -25,18 +20,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -76,7 +62,6 @@ public class ChatController {
 
 	public ChatController(SagMaClient client, String username) {
 		this.client = client;
-		this.client.setPacketHandler(this::handlePacket);
 		this.username = username;
 		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat",
 				new Locale("en", "EN"));
@@ -122,7 +107,7 @@ public class ChatController {
 			}
 		});
 
-		sendPacket(new UserListRequestPacket());
+		this.client.setPacketHandler(this::handlePacket);
 	}
 
 	private void openChatPane(ChatPane pane, String partner) {
@@ -211,21 +196,10 @@ public class ChatController {
 	private void handlePacket(Packet packet) {
 		if (packet instanceof UserListUpdatePacket) {
 			UserListUpdatePacket update = (UserListUpdatePacket) packet;
-			System.out.println("handlepacket");
-			Platform.runLater(() -> {
-				System.out.println("runlaterhandlepacket");
-				handleUserListUpdate(update);
-			});
-		} else if (packet instanceof UserListReplyPacket) {
-			UserListReplyPacket reply = (UserListReplyPacket) packet;
-			Platform.runLater(() -> {
-				handleUserListReply(reply);
-			});
+			Platform.runLater(() -> handleUserListUpdate(update));
 		} else if (packet instanceof ChatMessagePacket) {
 			ChatMessagePacket message = (ChatMessagePacket) packet;
-			Platform.runLater(() -> {
-				newMessage(message);
-			});
+			Platform.runLater(() -> newMessage(message));
 		}
 	}
 
@@ -248,41 +222,18 @@ public class ChatController {
 	}
 
 	private void handleUserListUpdate(UserListUpdatePacket update) {
-		System.out.println("update");
+		userTreeItem.setExpanded(true);
 		if (update.removed != null) {
-			System.out.println("removed");
 			for (String user : update.removed) {
-				for (TreeItem<String> item : userTreeItem.getChildren()) {
-					if (item.getValue().equals(user)) {
-						userTreeItem.getChildren().remove(item);
-						break;
-					}
-				}
+				userTreeItem.getChildren().removeIf(item -> item.getValue().equals(user));
 			}
 		}
 		if (update.added != null) {
-			System.out.println("added");
 			for (String user : update.added) {
 				userTreeItem.getChildren().add(new TreeItem<String>(user));
 			}
 		}
-		// userTreeItem.setExpanded(true);
-		// userTreeItem.getChildren().add(new TreeItem<String>("Test1"));
-		// userTree.setRoot(userTreeItem);
-
-	}
-
-	private void handleUserListReply(UserListReplyPacket reply) {
-		userTreeItem.getChildren().removeAll(userTreeItem.getChildren());
-		userTreeItem.setExpanded(true);
-		if (reply.users != null) {
-			for (String user : reply.users) {
-				userTreeItem.getChildren().add(new TreeItem<String>(user));
-			}
-		}
-		userTreeItem.getChildren().add(new TreeItem<String>("Test1"));
 		userTree.setRoot(userTreeItem);
-
 	}
 
 	/*

@@ -3,7 +3,6 @@ package de.gigagagagigo.sagma.client;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicReference;
 
 import de.gigagagagigo.sagma.SagMa;
 import de.gigagagagigo.sagma.net.Connection;
@@ -13,7 +12,7 @@ import de.gigagagagigo.sagma.packet.Packet;
 public class SagMaClient {
 
 	private final BlockingQueue<Packet> queue = new LinkedBlockingQueue<>();
-	private final AtomicReference<PacketHandler> handlerReference = new AtomicReference<>();
+	private final HandlerRef ref = new HandlerRef();
 
 	public void start(String server) {
 		new Thread(() -> {
@@ -22,7 +21,7 @@ public class SagMaClient {
 				// The connection will be closed if one of the io streams created here is closed.
 				Connection connection = NetworkFactories.get().openConnection(server, SagMa.PORT);
 				new Thread(new PacketWriter(queue, connection.getOutputStream())).start();
-				new Thread(new PacketReader(connection.getInputStream(), handlerReference)).start();
+				new Thread(new PacketReader(connection.getInputStream(), ref)).start();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -34,7 +33,7 @@ public class SagMaClient {
 	}
 
 	public void setPacketHandler(PacketHandler handler) {
-		handlerReference.set(handler);
+		ref.setHander(handler);
 	}
 
 }

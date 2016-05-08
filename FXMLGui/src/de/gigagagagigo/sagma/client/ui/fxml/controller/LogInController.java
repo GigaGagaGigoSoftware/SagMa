@@ -22,12 +22,15 @@ public class LogInController {
 	@FXML
 	private Button okButton;
 	@FXML
+	private Button registerButton;
+	@FXML
 	private Button cancelButton;
 	@FXML
 	private Label serverLabel;
 	@FXML
 	private Label usernameLabel;
-	@FXML private Label passwordLabel;
+	@FXML
+	private Label passwordLabel;
 
 	private Stage loginStage;
 	private boolean okClicked = false;
@@ -55,6 +58,15 @@ public class LogInController {
 
 	@FXML
 	private void handleOK() {
+		request(false);
+	}
+	
+	@FXML
+	private void register() {
+		request(true);
+	}
+
+	private void request(boolean isRegister) {
 
 		if (isInputValid()) {
 			changeButtonAccess();
@@ -65,22 +77,22 @@ public class LogInController {
 					AuthReplyPacket reply = (AuthReplyPacket) p;
 					if (reply.success) {
 						client.setPacketHandler(null);
-						Platform.runLater(()->{
+						Platform.runLater(() -> {
 							this.closeWindow();
 							Main.showChat(client, request.username);
 						});
-					} else{
-						Platform.runLater(()-> changeButtonAccess());
+					} else {
+						Platform.runLater(() -> changeButtonAccess());
 					}
-				} else{
-					Platform.runLater(()-> changeButtonAccess());
+				} else {
+					Platform.runLater(() -> changeButtonAccess());
 				}
 			});
 			client.start(tfServer.getText());
 			request = new AuthRequestPacket();
 			request.username = tfUsername.getText();
 			request.password = pfPassword.getText();
-			request.register = false;
+			request.register = isRegister;
 			client.sendPacket(request);
 		}
 	}
@@ -115,6 +127,7 @@ public class LogInController {
 	}
 
 	public void changeButtonAccess() {
-		okButton.setDisable(!okButton.isDisable());
+		okButton.setDisable(!okButton.isDisabled());
+		registerButton.setDisable(!registerButton.isDisabled());
 	}
 }

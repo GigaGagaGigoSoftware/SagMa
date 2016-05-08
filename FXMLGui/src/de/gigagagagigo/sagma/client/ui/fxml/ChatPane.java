@@ -15,7 +15,7 @@ public class ChatPane extends ScrollPane {
 	private VBox messages = new VBox();
 	private AnimationTimer timer;
 
-	public ChatPane(String partner, String username, AnchorPane messagePane) {
+	public ChatPane(String username, AnchorPane messagePane) {
 		this.username = username;
 		this.setContent(messages);
 		this.setHbarPolicy(ScrollBarPolicy.NEVER);

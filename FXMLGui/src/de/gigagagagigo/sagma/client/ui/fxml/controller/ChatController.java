@@ -7,7 +7,9 @@ import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
 import de.gigagagagigo.sagma.client.ui.fxml.Main;
 import de.gigagagagigo.sagma.packet.Packet;
+import de.gigagagagigo.sagma.packets.GroupListUpdatePacket;
 import de.gigagagagigo.sagma.packets.MessagePacket;
+import de.gigagagagigo.sagma.packets.SendMessagePacket;
 import de.gigagagagigo.sagma.packets.UserListUpdatePacket;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -42,7 +44,7 @@ public class ChatController {
 	@FXML
 	private TreeView<String> userTree;
 	@FXML
-	private TreeItem<String> userTreeItem;
+	private TreeItem<String> treeRoot;
 	@FXML
 	private ListView<ActiveChatCell> activeChatsList;
 	@FXML
@@ -60,6 +62,8 @@ public class ChatController {
 	@FXML
 	private MenuItem miClose, miNameChange, miStatus, miLogOut, miChangeLanguage, miOptions, miAbout, miTerms;
 
+	private TreeItem<String> userTreeItem, groupTreeItem;
+	
 	public ChatController(SagMaClient client, String username) {
 		this.client = client;
 		this.username = username;
@@ -75,14 +79,24 @@ public class ChatController {
 
 		activeChatsList.setItems(activeChatsCells);
 		sendTextArea.setWrapText(true);
+		userTreeItem = new TreeItem<String>(resources.getString("users"));
+		groupTreeItem = new TreeItem<String>(resources.getString("groups"));
+		
+		userTree.setRoot(treeRoot);
+		userTree.setShowRoot(false);
+		treeRoot.getChildren().addAll(userTreeItem, groupTreeItem);
 
 		userTree.setOnMouseClicked((e) -> {
+			System.out.println(userTree.getSelectionModel().getSelectedItem().getParent());
 			if (e.getClickCount() == 2 && userTree.getSelectionModel().getSelectedItem().getValue() != null
-					&& userTree.getSelectionModel().getSelectedItem().isLeaf()
-					&& !userTree.getSelectionModel().getSelectedItem().getValue().equals("Users")) {
+					&& userTree.getSelectionModel().getSelectedItem().getParent() != treeRoot){
 				String selected = userTree.getSelectionModel().getSelectedItem().getValue();
-
-				openChatPane(getChatPane(selected), selected);
+				
+				if(userTree.getSelectionModel().getSelectedItem().getParent() == groupTreeItem){
+					openChatPane(getChatPane(selected, true), selected);
+				}else{
+					openChatPane(getChatPane(selected), selected);					
+				}
 			}
 		});
 
@@ -128,10 +142,14 @@ public class ChatController {
 		});
 	}
 
-	private ChatPane getChatPane(String partner) {
+	private ChatPane getChatPane(String partner){
+		return getChatPane(partner, false);
+	}
+	
+	private ChatPane getChatPane(String partner, boolean isGroup) {
 		ChatPane pane = chats.get(partner);
 		if (pane == null) {
-			pane = new ChatPane(partner, username, messagePane);
+			pane = new ChatPane(username, messagePane);
 			pane.getStyleClass().add("chatPane");
 			chats.put(partner, pane);
 			activeChats.add(partner);
@@ -140,7 +158,7 @@ public class ChatController {
 			removeButton.setOnAction((e) -> {
 				closeChatPane(partner);
 			});
-			ActiveChatCell cell = new ActiveChatCell(partner, removeButton);
+			ActiveChatCell cell = new ActiveChatCell(partner, removeButton, isGroup);
 			activeChatsCells.add(cell);
 
 		}
@@ -172,9 +190,18 @@ public class ChatController {
 			String text = sendTextArea.getText();
 			sendTextArea.setText("");
 
+			// if (!text.trim().equals("")) {
+			// MessagePacket message = new MessagePacket();
+			// message.userName = partner;
+			// message.content = text;
+			// sendPacket(message);
+			//
+			// getChatPane(partner).appendOwnMessage(text);
+			// }
 			if (!text.trim().equals("")) {
-				MessagePacket message = new MessagePacket();
-				message.userName = partner;
+				SendMessagePacket message = new SendMessagePacket();
+				message.entityName = partner;
+				message.isGroup = getActiveChatCell(partner).isGroup();
 				message.content = text;
 				sendPacket(message);
 
@@ -197,6 +224,9 @@ public class ChatController {
 		if (packet instanceof UserListUpdatePacket) {
 			UserListUpdatePacket update = (UserListUpdatePacket) packet;
 			Platform.runLater(() -> handleUserListUpdate(update));
+		} else if (packet instanceof GroupListUpdatePacket) {
+			GroupListUpdatePacket update = (GroupListUpdatePacket) packet;
+			Platform.runLater(() -> handleGroupListUpdate(update));
 		} else if (packet instanceof MessagePacket) {
 			MessagePacket message = (MessagePacket) packet;
 			Platform.runLater(() -> newMessage(message));
@@ -204,17 +234,25 @@ public class ChatController {
 	}
 
 	private void newMessage(MessagePacket message) {
-		getChatPane(message.userName).handleChatMessage(message);
+		String target = "";
 
+		if (message.groupName == null) {
+			target = message.userName;
+		} else {
+			target = message.groupName;
+		}
+		getChatPane(target).handleChatMessage(message);
+		System.out.println(target);
 		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
-			if (!activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(message.userName)) {
+			if (!activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(target)) {
 				for (ActiveChatCell cell : activeChatsList.getItems()) {
-					if (cell.getPartner().equals(message.userName)) {
+					if (cell.getPartner().equals(target)) {
 						cell.changeNewMessage(true);
 					}
 				}
 			}
 		}
+
 	}
 
 	public void sendPacket(Packet packet) {
@@ -233,7 +271,20 @@ public class ChatController {
 				userTreeItem.getChildren().add(new TreeItem<String>(user));
 			}
 		}
-		userTree.setRoot(userTreeItem);
+	}
+
+	private void handleGroupListUpdate(GroupListUpdatePacket update) {
+		groupTreeItem.setExpanded(true);
+		if (update.removed != null) {
+			for (String user : update.removed) {
+				groupTreeItem.getChildren().removeIf(item -> item.getValue().equals(user));
+			}
+		}
+		if (update.added != null) {
+			for (String user : update.added) {
+				groupTreeItem.getChildren().add(new TreeItem<String>(user));
+			}
+		}
 	}
 
 	/*
@@ -258,6 +309,10 @@ public class ChatController {
 			locale = new Locale("ru", "RU");
 			break;
 		}
+		editText(locale);
+	}
+	
+	private void editText(Locale locale){
 		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat", locale);
 		activeChatsLabel.setText(language.getString("activeList"));
 		userLabel.setText(language.getString("userList"));
@@ -270,7 +325,8 @@ public class ChatController {
 		miAbout.setText(language.getString("miAbout"));
 		miTerms.setText(language.getString("miTerms"));
 		userTreeItem.setValue(language.getString("users"));
-
+		groupTreeItem.setValue(language.getString("grops"));
+		
 	}
 
 	public void showAbout() {
@@ -308,13 +364,15 @@ public class ChatController {
 	 *
 	 */
 	public static class ActiveChatCell extends HBox {
+		boolean isGroup;
 		Label lPartner;
 		Button button;
 		String partner;
 		FadeTransition ft;
 
-		ActiveChatCell(String partner, Button button) {
+		ActiveChatCell(String partner, Button button, boolean isGroup) {
 			super();
+			this.isGroup = isGroup;
 			this.button = button;
 			this.partner = partner;
 			this.setMaxHeight(10);
@@ -352,6 +410,10 @@ public class ChatController {
 
 		public Button getButton() {
 			return button;
+		}
+		
+		public boolean isGroup(){
+			return isGroup;
 		}
 	}
 }

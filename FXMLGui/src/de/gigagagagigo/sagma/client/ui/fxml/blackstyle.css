@@ -231,7 +231,7 @@
 #loginMainPane{
 	-fx-background-color: #444;
 }
-#okButton, #cancelButton{
+#okButton, #cancelButton, #registerButton{
 	-fx-background-color:
 		linear-gradient(#2E1300 0%, #733000 50%, #2E1300 100%);
 	-fx-text-fill: #FFF;

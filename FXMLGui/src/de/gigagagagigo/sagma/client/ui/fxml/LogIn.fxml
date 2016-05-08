@@ -19,15 +19,17 @@
 		GridPane.columnIndex="0" GridPane.rowIndex="1" />
 	<TextField fx:id="tfUsername" GridPane.columnIndex="1"
 		GridPane.rowIndex="1" />
-		
-	<Label fx:id="passwordLabel" text="Passwort:" GridPane.columnIndex="0"
-		GridPane.rowIndex="2" />
+
+	<Label fx:id="passwordLabel" text="Passwort:"
+		GridPane.columnIndex="0" GridPane.rowIndex="2" />
 	<PasswordField fx:id="pfPassword" GridPane.columnIndex="1"
 		GridPane.rowIndex="2" />
 
-	<HBox GridPane.columnIndex="1" GridPane.rowIndex="3" spacing="20" alignment="bottom_right">
-		<Button fx:id="okButton" onAction="#handleOK" text="OK"/>
-		<Button fx:id="cancelButton" onAction="#handleCancel" text="Cancel"/>
+	<HBox GridPane.columnIndex="1" GridPane.rowIndex="3" spacing="20"
+		alignment="bottom_right">
+		<Button fx:id="okButton" onAction="#handleOK" text="OK" />
+		<Button fx:id="registerButton" onAction="#register" text="Register" />
+		<Button fx:id="cancelButton" onAction="#handleCancel" text="Cancel" />
 	</HBox>
 
 </GridPane>

@@ -9,7 +9,7 @@
 <AnchorPane xmlns:fx="http://javafx.com/fxml/1">
 	<VBox>
 		<Label id="aboutText" text="%about" />
-		<Button fx:id="closeButton" text="%close"/>
+		<Button fx:id="closeButton" text="%close" />
 	</VBox>
 </AnchorPane>
 

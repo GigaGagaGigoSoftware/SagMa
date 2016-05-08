@@ -25,25 +25,27 @@
 			<menus>
 				<Menu fx:id="mSagMa" mnemonicParsing="false" text="%mSagMa">
 					<items>
-						<Menu fx:id="miChangeLanguage" mnemonicParsing="false"
-							text="%miLanguage" >
-								<MenuItem text="EN" onAction="#changeLanguage" />
-								<MenuItem text="DE" onAction="#changeLanguage"/>
-								<MenuItem text="RU" onAction="#changeLanguage"/>
+						<Menu fx:id="miChangeLanguage" mnemonicParsing="false" text="%miLanguage">
+							<MenuItem text="EN" onAction="#changeLanguage" />
+							<MenuItem text="DE" onAction="#changeLanguage" />
+							<MenuItem text="RU" onAction="#changeLanguage" />
 						</Menu>
 						<MenuItem fx:id="miOptions" mnemonicParsing="false" text="%miOptions" />
-						<!-- <MenuItem fx:id="miNameChange" mnemonicParsing="false" text="%miNameChange"
-							/> <MenuItem fx:id="miStatus" mnemonicParsing="false" text="%miStatus" />
+						<!-- <MenuItem fx:id="miNameChange" mnemonicParsing="false" text="%miNameChange" 
+							/> <MenuItem fx:id="miStatus" mnemonicParsing="false" text="%miStatus" /> 
 							<MenuItem fx:id="miLogOut" mnemonicParsing="false" text="%miLogOut" /> -->
-						<MenuItem fx:id="miClose" mnemonicParsing="false" text="%miClose" onAction="#close"/>
+						<MenuItem fx:id="miClose" mnemonicParsing="false" text="%miClose"
+							onAction="#close" />
 					</items>
 				</Menu>
-				<!-- <Menu fx:id="mActions" mnemonicParsing="false" text="%mActions">
+				<!-- <Menu fx:id="mActions" mnemonicParsing="false" text="%mActions"> 
 					<items> </items> </Menu> -->
 				<Menu fx:id="mHelp" mnemonicParsing="false" text="%mHelp">
 					<items>
-						<MenuItem fx:id="miAbout" mnemonicParsing="false" text="%miAbout" onAction="#showAbout"/>
-						<MenuItem fx:id="miTerms" mnemonicParsing="false" text="%miTerms" onAction="#showTerms"/>
+						<MenuItem fx:id="miAbout" mnemonicParsing="false" text="%miAbout"
+							onAction="#showAbout" />
+						<MenuItem fx:id="miTerms" mnemonicParsing="false" text="%miTerms"
+							onAction="#showTerms" />
 					</items>
 				</Menu>
 			</menus>
@@ -136,7 +138,7 @@
 											</top>
 											<center>
 												<TreeView fx:id="userTree" BorderPane.alignment="CENTER">
-													<TreeItem fx:id="userTreeItem" value="%users" />
+													<TreeItem fx:id="treeRoot" />
 												</TreeView>
 											</center>
 										</BorderPane>

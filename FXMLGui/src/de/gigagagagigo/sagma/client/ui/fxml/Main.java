@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.controller.ChatController;
 import de.gigagagagigo.sagma.client.ui.fxml.controller.LogInController;
+import de.gigagagagigo.sagma.packets.DisconnectPacket;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -46,6 +47,7 @@ public class Main extends Application {
 			Scene scene = new Scene(root, 550, 550);
 			scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
 			primaryStage.setScene(scene);
+			primaryStage.setOnCloseRequest(e -> client.sendPacket(new DisconnectPacket()));
 
 			primaryStage.show();
 		} catch (Exception e) {

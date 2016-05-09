@@ -84,7 +84,6 @@ public class ChatController {
 		treeRoot.getChildren().addAll(userTreeItem, groupTreeItem);
 
 		userTree.setOnMouseClicked((e) -> {
-			System.out.println(userTree.getSelectionModel().getSelectedItem().getParent());
 			if (e.getClickCount() == 2 && userTree.getSelectionModel().getSelectedItem().getValue() != null
 					&& userTree.getSelectionModel().getSelectedItem().getParent() != treeRoot){
 				String selected = userTree.getSelectionModel().getSelectedItem().getValue();
@@ -146,6 +145,12 @@ public class ChatController {
 	private ChatPane getChatPane(String partner, boolean isGroup) {
 		ChatPane pane = chats.get(partner);
 		if (pane == null) {
+
+			if (isGroup) {
+				MembershipPacket packet = new MembershipPacket();
+				packet.groupName = partner;
+				client.sendPacket(packet);
+			}
 			pane = new ChatPane(username, messagePane);
 			pane.getStyleClass().add("chatPane");
 			chats.put(partner, pane);
@@ -153,6 +158,12 @@ public class ChatController {
 
 			Button removeButton = new Button();
 			removeButton.setOnAction((e) -> {
+				if (isGroup) {
+					MembershipPacket packet = new MembershipPacket();
+					packet.groupName = partner;
+					packet.leave = true;
+					client.sendPacket(packet);
+				}
 				closeChatPane(partner);
 			});
 			ActiveChatCell cell = new ActiveChatCell(partner, removeButton, isGroup);
@@ -239,7 +250,6 @@ public class ChatController {
 			target = message.groupName;
 		}
 		getChatPane(target).handleChatMessage(message);
-		System.out.println(target);
 		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
 			if (!activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(target)) {
 				for (ActiveChatCell cell : activeChatsList.getItems()) {

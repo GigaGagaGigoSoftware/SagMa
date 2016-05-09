@@ -7,10 +7,7 @@ import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
 import de.gigagagagigo.sagma.client.ui.fxml.Main;
 import de.gigagagagigo.sagma.packet.Packet;
-import de.gigagagagigo.sagma.packets.GroupListUpdatePacket;
-import de.gigagagagigo.sagma.packets.MessagePacket;
-import de.gigagagagigo.sagma.packets.SendMessagePacket;
-import de.gigagagagigo.sagma.packets.UserListUpdatePacket;
+import de.gigagagagigo.sagma.packets.*;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -325,7 +322,7 @@ public class ChatController {
 		miAbout.setText(language.getString("miAbout"));
 		miTerms.setText(language.getString("miTerms"));
 		userTreeItem.setValue(language.getString("users"));
-		groupTreeItem.setValue(language.getString("grops"));
+		groupTreeItem.setValue(language.getString("groups"));
 		
 	}
 

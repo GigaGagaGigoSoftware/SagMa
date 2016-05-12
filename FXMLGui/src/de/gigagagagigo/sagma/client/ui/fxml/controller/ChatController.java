@@ -57,7 +57,7 @@ public class ChatController {
 	@FXML
 	private Menu mSagMa, mActions, mHelp;
 	@FXML
-	private MenuItem miClose, miNameChange, miStatus, miLogOut, miChangeLanguage, miOptions, miAbout, miTerms;
+	private MenuItem miClose, miNameChange, miStatus, miNewGroup, miLogOut, miChangeLanguage, miOptions, miAbout, miTerms;
 
 	private TreeItem<String> userTreeItem, groupTreeItem;
 	
@@ -133,7 +133,7 @@ public class ChatController {
 			public void run() {
 				activeChatsList.scrollTo(getActiveChatCell(partner));
 				activeChatsList.getSelectionModel().select(getActiveChatCell(partner));
-				sendTextArea.getStyleClass().remove("sendNoPartner");
+				sendTextArea.getStyleClass().remove("validateError");
 			}
 		});
 	}
@@ -198,14 +198,6 @@ public class ChatController {
 			String text = sendTextArea.getText();
 			sendTextArea.setText("");
 
-			// if (!text.trim().equals("")) {
-			// MessagePacket message = new MessagePacket();
-			// message.userName = partner;
-			// message.content = text;
-			// sendPacket(message);
-			//
-			// getChatPane(partner).appendOwnMessage(text);
-			// }
 			if (!text.trim().equals("")) {
 				SendMessagePacket message = new SendMessagePacket();
 				message.entityName = partner;
@@ -216,7 +208,7 @@ public class ChatController {
 				getChatPane(partner).appendOwnMessage(text);
 			}
 		} else {
-			sendTextArea.getStyleClass().add("sendNoPartner");
+			sendTextArea.getStyleClass().add("validateError");
 		}
 	}
 
@@ -293,6 +285,38 @@ public class ChatController {
 			}
 		}
 	}
+	
+	public void newGroup(){
+		Stage newGroupStage = new Stage();
+		newGroupStage.initModality(Modality.WINDOW_MODAL);
+		newGroupStage.initOwner(messagePane.getScene().getWindow());
+		
+		HBox box = new HBox();
+		box.getStyleClass().add("newGroup");
+		TextField tfName = new TextField();
+		Button bGroupOK = new Button(language.getString("create"));
+		bGroupOK.setOnAction(e ->{
+			if(!tfName.getText().trim().isEmpty()){
+				createGroup(tfName.getText().trim());
+				newGroupStage.close();
+			}
+			else{
+				tfName.getStyleClass().add("validateError");
+			}
+		});
+		box.getChildren().add(new Label(language.getString("groupName")));
+		box.getChildren().add(tfName);
+		box.getChildren().add(bGroupOK);
+		
+		Scene scene = new Scene(box);
+		scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
+		newGroupStage.setScene(scene);
+		newGroupStage.show();
+	}
+	
+	private void createGroup(String name){
+		openChatPane(getChatPane(name, true), name);
+	}
 
 	/*
 	 * Menu
@@ -330,6 +354,7 @@ public class ChatController {
 		miChangeLanguage.setText(language.getString("miLanguage"));
 		miOptions.setText(language.getString("miOptions"));
 		miAbout.setText(language.getString("miAbout"));
+		miNewGroup.setText(language.getString("miNewGroup"));
 		miTerms.setText(language.getString("miTerms"));
 		userTreeItem.setValue(language.getString("users"));
 		groupTreeItem.setValue(language.getString("groups"));

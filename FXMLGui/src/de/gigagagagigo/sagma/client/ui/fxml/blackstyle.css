@@ -62,10 +62,10 @@
 	-fx-text-fill: white;
 }
 .menu:showing, .menu:hover, .menu-item:hover, .menu-item:focused{
-	-fx-background-color: rgba(100, 100, 100, 0.3);
+	-fx-background-color: rgba(30, 30, 30, 0.8);
 }
 .context-menu{
-	-fx-background-color: rgba(150, 150, 150, 0.4);
+	-fx-background-color: rgba(40, 40, 40, 0.8);
 }
 
 
@@ -87,6 +87,7 @@
 
 .scroll-pane{
 	-fx-focus-color: transparent;
+	-fx-base: transparent;
 	-fx-background-insets: 0;
 	-fx-padding: 0;
 }
@@ -130,7 +131,7 @@
 	-fx-faint-focus-color: transparent;
 }
 
-.sendNoPartner{
+.validateError{
 	-fx-border-color: #F00;
 }
 
@@ -240,7 +241,19 @@
 
 }
 
+/* New Group */
+.newGroup{
+	-fx-spacing: 5px;
+	-fx-background-color: #000;
+}
 
+.newGroup .label{
+	-fx-background-color: #000;
+}
+
+.newGroup .button{
+	
+}
 
 
 

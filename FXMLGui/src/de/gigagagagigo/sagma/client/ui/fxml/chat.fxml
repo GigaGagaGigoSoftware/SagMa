@@ -30,6 +30,7 @@
 							<MenuItem text="DE" onAction="#changeLanguage" />
 							<MenuItem text="RU" onAction="#changeLanguage" />
 						</Menu>
+						<MenuItem fx:id="miNewGroup" mnemonicParsing="false" text="%miNewGroup" onAction="#newGroup" />
 						<MenuItem fx:id="miOptions" mnemonicParsing="false" text="%miOptions" />
 						<!-- <MenuItem fx:id="miNameChange" mnemonicParsing="false" text="%miNameChange" 
 							/> <MenuItem fx:id="miStatus" mnemonicParsing="false" text="%miStatus" /> 

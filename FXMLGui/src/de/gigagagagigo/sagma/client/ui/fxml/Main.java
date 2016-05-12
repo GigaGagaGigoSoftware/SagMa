@@ -24,6 +24,9 @@ public class Main extends Application {
 		launch(args);
 	}
 
+	/**
+	 * starting method shows the login screen
+	 */
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
@@ -31,6 +34,11 @@ public class Main extends Application {
 		showLogIn();
 	}
 
+	/**
+	 * shows the chat scene after the login 
+	 * @param client SagMaClient
+	 * @param username String
+	 */
 	public static void showChat(SagMaClient client, String username) {
 		try {
 
@@ -55,6 +63,10 @@ public class Main extends Application {
 		}
 	}
 
+	/**
+	 * shows the login scene
+	 * @return boolean
+	 */
 	private boolean showLogIn() {
 		try {
 			FXMLLoader loader = new FXMLLoader();

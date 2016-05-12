@@ -25,7 +25,10 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
+/**
+ * Controller for FXML-File chat.fxml
+ *
+ */
 public class ChatController {
 
 	private String username;
@@ -68,6 +71,9 @@ public class ChatController {
 				new Locale("en", "EN"));
 	}
 
+	/**
+	 * Sets the lists and events for activeChats, ser annd group tree and the messageTextField
+	 */
 	@FXML
 	private void initialize() {
 
@@ -120,6 +126,11 @@ public class ChatController {
 		this.client.setPacketHandler(this::handlePacket);
 	}
 
+	/**
+	 * opens the ChatPane for the given chat in the messagePane
+	 * @param pane ChatPane
+	 * @param partner String
+	 */
 	private void openChatPane(ChatPane pane, String partner) {
 		AnchorPane.setTopAnchor(pane, 0.0);
 		AnchorPane.setBottomAnchor(pane, 0.0);
@@ -138,10 +149,23 @@ public class ChatController {
 		});
 	}
 
+	/**
+	 * Overloading methode for single user
+	 * calls getChatPane(String, boolean)
+	 * @param partner String
+	 * @return ChatPane
+	 */
 	private ChatPane getChatPane(String partner){
 		return getChatPane(partner, false);
 	}
 	
+	/**
+	 * creates a new ChatPane if the searched one does not exist
+	 * and/or returns the searched pane
+	 * @param partner String
+	 * @param isGroup boolean
+	 * @return ChatPane
+	 */
 	private ChatPane getChatPane(String partner, boolean isGroup) {
 		ChatPane pane = chats.get(partner);
 		if (pane == null) {
@@ -173,6 +197,10 @@ public class ChatController {
 		return pane;
 	}
 
+	/**
+	 * closes the selected ChatPane and remove the chat from the lists
+	 * @param partner String
+	 */
 	public void closeChatPane(String partner) {
 		if (this.activeChatsList.getSelectionModel().getSelectedItem().getPartner().equals(partner)) {
 			messagePane.getChildren().clear();
@@ -182,6 +210,11 @@ public class ChatController {
 		activeChatsCells.remove(getActiveChatCell(partner));
 	}
 
+	/**
+	 * returns the ActiveChatCell for the given partner
+	 * @param partner String
+	 * @return ActiveChatCell
+	 */
 	private ActiveChatCell getActiveChatCell(String partner) {
 		for (ActiveChatCell cell : activeChatsCells) {
 			if (cell.getPartner().equals(partner)) {
@@ -191,6 +224,10 @@ public class ChatController {
 		return null;
 	}
 
+	/**
+	 * validates the message to be send and sends a new messagePacket to the server
+	 * appends the message to the own messagePane
+	 */
 	public void sendMessage() {
 		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
 			String partner = activeChatsList.getSelectionModel().getSelectedItem().getPartner();
@@ -217,8 +254,8 @@ public class ChatController {
 	 */
 
 	/**
-	 *
-	 * @param packet
+	 *	handles all incoming packets and calls the specific method
+	 * @param packet Packet
 	 */
 	private void handlePacket(Packet packet) {
 		if (packet instanceof UserListUpdatePacket) {
@@ -233,6 +270,10 @@ public class ChatController {
 		}
 	}
 
+	/**
+	 * handles incoming messages and appends it to the chat
+	 * @param message MessagePacket
+	 */
 	private void newMessage(MessagePacket message) {
 		String target = "";
 
@@ -253,11 +294,19 @@ public class ChatController {
 		}
 
 	}
-
+	
+	/**
+	 * sends a packet
+	 * @param packet Packet
+	 */
 	public void sendPacket(Packet packet) {
 		client.sendPacket(packet);
 	}
 
+	/**
+	 * handles UserListUpdatePackets to refresh the userlist if any changes appear
+	 * @param update UserListUpdatePacket
+	 */
 	private void handleUserListUpdate(UserListUpdatePacket update) {
 		userTreeItem.setExpanded(true);
 		if (update.removed != null) {
@@ -272,6 +321,10 @@ public class ChatController {
 		}
 	}
 
+	/**
+	 * handles GroupListUpdatePackets to refresh the grouplist if any changes appear
+	 * @param update GroupListUpdatePacket
+	 */
 	private void handleGroupListUpdate(GroupListUpdatePacket update) {
 		groupTreeItem.setExpanded(true);
 		if (update.removed != null) {
@@ -286,6 +339,9 @@ public class ChatController {
 		}
 	}
 	
+	/**
+	 * opens a new dialog window for the user to create a new chat group
+	 */
 	public void newGroup(){
 		Stage newGroupStage = new Stage();
 		newGroupStage.initModality(Modality.WINDOW_MODAL);
@@ -314,6 +370,10 @@ public class ChatController {
 		newGroupStage.show();
 	}
 	
+	/**
+	 * creates the new group
+	 * @param name String
+	 */
 	private void createGroup(String name){
 		openChatPane(getChatPane(name, true), name);
 	}
@@ -322,10 +382,17 @@ public class ChatController {
 	 * Menu
 	 */
 
+	/**
+	 * closes the window
+	 */
 	public void close() {
 		Platform.exit();
 	}
 
+	/**
+	 * sends the locale to the editText method to change the language
+	 * @param e ActionEvent
+	 */
 	public void changeLanguage(ActionEvent e) {
 		Locale locale = new Locale("en", "EN");
 		switch (((MenuItem) e.getSource()).getText()) {
@@ -343,6 +410,10 @@ public class ChatController {
 		editText(locale);
 	}
 	
+	/**
+	 * change the text of all fields to the new locale
+	 * @param locale Locale
+	 */
 	private void editText(Locale locale){
 		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat", locale);
 		activeChatsLabel.setText(language.getString("activeList"));
@@ -361,17 +432,27 @@ public class ChatController {
 		
 	}
 
+	/**
+	 * shows a new window with the about us text
+	 */
 	public void showAbout() {
 		FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/About.fxml"));
 		showNewWindow(loader);
 	}
 
+	/**
+	 * shows a new window with the terms
+	 */
 	public void showTerms() {
 		FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/About.fxml"));
 		showNewWindow(loader);
 
 	}
 
+	/**
+	 * shows a new window for about and terms
+	 * @param loader FXMLLoader
+	 */
 	private void showNewWindow(FXMLLoader loader) {
 		try {
 			loader.setController(new InfoController());
@@ -426,6 +507,10 @@ public class ChatController {
 			this.getChildren().addAll(lPartner, button);
 		}
 
+		/**
+		 * if an unread message exist the text signals this event
+		 * @param isNew boolean
+		 */
 		public void changeNewMessage(boolean isNew) {
 			if (isNew) {
 				lPartner.getStyleClass().add("unreadMessage");
@@ -436,14 +521,26 @@ public class ChatController {
 			}
 		}
 
+		/**
+		 * returns the partner
+		 * @return String
+		 */
 		public String getPartner() {
 			return this.partner;
 		}
 
+		/**
+		 * returns the deleteButton
+		 * @return Button
+		 */
 		public Button getButton() {
 			return button;
 		}
 		
+		/**
+		 * retrns wether the chat is a group chat or not
+		 * @return boolean
+		 */
 		public boolean isGroup(){
 			return isGroup;
 		}

@@ -48,24 +48,50 @@ public class LogInController {
 		okButton.prefWidthProperty().bind(cancelButton.prefWidthProperty());
 	}
 
+	/**
+	 * sets loginStage
+	 * @param loginStage Stage
+	 */
 	public void setLoginStage(Stage loginStage) {
 		this.loginStage = loginStage;
 	}
 
+	/**
+	 * returns if ok is clicked
+	 * @return boolean
+	 */
 	public boolean isOkClicked() {
 		return okClicked;
 	}
 
+	/**
+	 * button click handler for cancelButton
+	 */
+	@FXML
+	private void handleCancel() {
+		loginStage.close();
+	}
+
+	/**
+	 * button click handler for okButton
+	 */
 	@FXML
 	private void handleOK() {
 		request(false);
 	}
 	
+	/**
+	 * button click handler for RegisterButton
+	 */
 	@FXML
 	private void register() {
 		request(true);
 	}
 
+	/**
+	 * sends a request to the server if login is correct or registers a new user
+	 * @param isRegister boolean
+	 */
 	private void request(boolean isRegister) {
 
 		if (isInputValid()) {
@@ -97,11 +123,10 @@ public class LogInController {
 		}
 	}
 
-	@FXML
-	private void handleCancel() {
-		loginStage.close();
-	}
-
+	/**
+	 * checks if the input is valid
+	 * @return boolean
+	 */
 	private boolean isInputValid() {
 		String errorMessage = "";
 
@@ -114,18 +139,32 @@ public class LogInController {
 		}
 	}
 
+	/**
+	 * closes the stage
+	 */
 	public void closeWindow() {
 		this.loginStage.close();
 	}
 
+	/**
+	 * retuurns the username
+	 * @return String
+	 */
 	public String getUsername() {
 		return username;
 	}
 
+	/**
+	 * returns the server
+	 * @return String
+	 */
 	public String getServer() {
 		return server;
 	}
 
+	/**
+	 * changes the button accessibility
+	 */
 	public void changeButtonAccess() {
 		okButton.setDisable(!okButton.isDisabled());
 		registerButton.setDisable(!registerButton.isDisabled());

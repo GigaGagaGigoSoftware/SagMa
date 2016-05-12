@@ -117,7 +117,7 @@ public class SagMaServer implements Runnable {
 			group.forEach(h -> h.sendPacket(update));
 		}
 		if (group.isEmpty()) {
-			groups.remove(group);
+			groups.remove(groupName);
 			GroupListUpdatePacket update = new GroupListUpdatePacket();
 			update.removed = new String[] { groupName };
 			activeHandlers.values().forEach(h -> h.sendPacket(update));

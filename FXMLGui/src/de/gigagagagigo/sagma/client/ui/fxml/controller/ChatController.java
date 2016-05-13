@@ -67,7 +67,7 @@ public class ChatController {
 	public ChatController(SagMaClient client, String username) {
 		this.client = client;
 		this.username = username;
-		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat",
+		language = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat",
 				new Locale("en", "EN"));
 	}
 
@@ -77,7 +77,7 @@ public class ChatController {
 	@FXML
 	private void initialize() {
 
-		resources = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat",
+		resources = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat",
 				new Locale("en", "EN"));
 
 		activeChatsList.setItems(activeChatsCells);
@@ -415,7 +415,7 @@ public class ChatController {
 	 * @param locale Locale
 	 */
 	private void editText(Locale locale){
-		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat", locale);
+		language = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat", locale);
 		activeChatsLabel.setText(language.getString("activeList"));
 		userLabel.setText(language.getString("userList"));
 		bSend.setText(language.getString("sendButton"));

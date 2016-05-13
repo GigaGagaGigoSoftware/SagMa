@@ -30,7 +30,8 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
-		language = ResourceBundle.getBundle("de\\gigagagagigo\\sagma\\client\\ui\\fxml\\language\\chat", new Locale("en", "EN"));
+		language = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat", new Locale(
+			"en", "EN"));
 		showLogIn();
 	}
 

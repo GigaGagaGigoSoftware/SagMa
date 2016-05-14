@@ -165,6 +165,13 @@
 }
 .list-cell .button{
 	-fx-padding: 0;
+	-fx-min-width: 24;
+	-fx-max-width: 24;
+	-fx-min-height: 24;
+	-fx-max-height: 24;
+}
+.list-cell .label{
+	-fx-font-size: 15px;
 }
 .list-cell{
 	-fx-cell-size: 30;

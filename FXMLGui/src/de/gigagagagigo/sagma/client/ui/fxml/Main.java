@@ -10,6 +10,7 @@ import de.gigagagagigo.sagma.packets.DisconnectPacket;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
@@ -30,6 +31,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
+		primaryStage.getIcons().addAll(new Image(getClass().getResourceAsStream("img/SagMaIcon64.png")),new Image(getClass().getResourceAsStream("img/SagMaIcon16.png")));
 		language = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat", new Locale(
 			"en", "EN"));
 		showLogIn();

@@ -20,6 +20,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
@@ -479,6 +481,7 @@ public class ChatController {
 	public static class ActiveChatCell extends HBox {
 		boolean isGroup;
 		Label lPartner;
+		Image chatIcon;
 		Button button;
 		String partner;
 		FadeTransition ft;
@@ -489,13 +492,20 @@ public class ChatController {
 			this.button = button;
 			this.partner = partner;
 			this.setMaxHeight(10);
+			if(isGroup){
+				chatIcon = new Image(getClass().getResourceAsStream("../img/group.png"));
+			}else{
+				chatIcon = new Image(getClass().getResourceAsStream("../img/person.png"));				
+			}
+			ImageView iconView = new ImageView(chatIcon);
+			iconView.setFitHeight(5);
 			lPartner = new Label(partner);
 			lPartner.setMaxWidth(Double.MAX_VALUE);
 			lPartner.getStyleClass().add("unreadMessage");
 			HBox.setHgrow(lPartner, Priority.ALWAYS);
+//			button.prefWidthProperty().bind(button.heightProperty());
 			button.setText("X");
 			button.getStyleClass().add("deleteButton");
-			button.prefWidthProperty().bind(button.heightProperty());
 
 			ft = new FadeTransition(Duration.millis(800), lPartner);
 			ft.setFromValue(1.0);
@@ -504,7 +514,7 @@ public class ChatController {
 			ft.setAutoReverse(true);
 
 			this.setSpacing(3);
-			this.getChildren().addAll(lPartner, button);
+			this.getChildren().addAll(new ImageView(chatIcon), lPartner, button);
 		}
 
 		/**

@@ -2,8 +2,10 @@ package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
 import java.util.ResourceBundle;
 
+import de.gigagagagigo.sagma.client.Handler;
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.Main;
+import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packets.AuthReplyPacket;
 import de.gigagagagigo.sagma.packets.AuthRequestPacket;
 import javafx.application.Platform;
@@ -11,30 +13,22 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-public class LogInController {
+public class LogInController implements Handler {
 
-	@FXML
-	private TextField tfServer;
-	@FXML
-	private TextField tfUsername;
-	@FXML
-	private PasswordField pfPassword;
-	@FXML
-	private Button okButton;
-	@FXML
-	private Button registerButton;
-	@FXML
-	private Button cancelButton;
-	@FXML
-	private Label serverLabel;
-	@FXML
-	private Label usernameLabel;
-	@FXML
-	private Label passwordLabel;
+	@FXML private TextField tfServer;
+	@FXML private TextField tfUsername;
+	@FXML private PasswordField pfPassword;
+	@FXML private Button okButton;
+	@FXML private Button registerButton;
+	@FXML private Button cancelButton;
+	@FXML private Label serverLabel;
+	@FXML private Label usernameLabel;
+	@FXML private Label passwordLabel;
 
 	private Stage loginStage;
 	private boolean okClicked = false;
 	private String username, server;
+	private SagMaClient client;
 	private AuthRequestPacket request;
 
 	@FXML
@@ -50,6 +44,7 @@ public class LogInController {
 
 	/**
 	 * sets loginStage
+	 * 
 	 * @param loginStage Stage
 	 */
 	public void setLoginStage(Stage loginStage) {
@@ -58,6 +53,7 @@ public class LogInController {
 
 	/**
 	 * returns if ok is clicked
+	 * 
 	 * @return boolean
 	 */
 	public boolean isOkClicked() {
@@ -79,7 +75,7 @@ public class LogInController {
 	private void handleOK() {
 		request(false);
 	}
-	
+
 	/**
 	 * button click handler for RegisterButton
 	 */
@@ -90,30 +86,15 @@ public class LogInController {
 
 	/**
 	 * sends a request to the server if login is correct or registers a new user
+	 * 
 	 * @param isRegister boolean
 	 */
 	private void request(boolean isRegister) {
 
 		if (isInputValid()) {
 			changeButtonAccess();
-
-			SagMaClient client = new SagMaClient();
-			client.setPacketHandler(p -> {
-				if (p instanceof AuthReplyPacket) {
-					AuthReplyPacket reply = (AuthReplyPacket) p;
-					if (reply.success) {
-						client.setPacketHandler(null);
-						Platform.runLater(() -> {
-							this.closeWindow();
-							Main.showChat(client, request.username);
-						});
-					} else {
-						Platform.runLater(() -> changeButtonAccess());
-					}
-				} else {
-					Platform.runLater(() -> changeButtonAccess());
-				}
-			});
+			client = new SagMaClient(Platform::runLater);
+			client.setHandler(this);
 			client.start(tfServer.getText());
 			request = new AuthRequestPacket();
 			request.username = tfUsername.getText();
@@ -123,8 +104,26 @@ public class LogInController {
 		}
 	}
 
+	@Override
+	public void handlePacket(Packet packet) {
+		AuthReplyPacket reply = (AuthReplyPacket) packet;
+		if (reply.success) {
+			client.setHandler(null);
+			closeWindow();
+			Main.showChat(client, request.username);
+		} else {
+			changeButtonAccess();
+		}
+	}
+
+	@Override
+	public void handleException(Exception exception) {
+		changeButtonAccess();
+	}
+
 	/**
 	 * checks if the input is valid
+	 * 
 	 * @return boolean
 	 */
 	private boolean isInputValid() {
@@ -148,6 +147,7 @@ public class LogInController {
 
 	/**
 	 * retuurns the username
+	 * 
 	 * @return String
 	 */
 	public String getUsername() {
@@ -156,6 +156,7 @@ public class LogInController {
 
 	/**
 	 * returns the server
+	 * 
 	 * @return String
 	 */
 	public String getServer() {

@@ -1,11 +1,10 @@
 package de.gigagagagigo.sagma.client;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 
 import de.gigagagagigo.sagma.SagMa;
+import de.gigagagagigo.sagma.net.Connection;
 import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packet.PacketOutputStream;
 import de.gigagagagigo.sagma.packets.DisconnectPacket;
@@ -13,12 +12,14 @@ import de.gigagagagigo.sagma.packets.VersionCheckRequestPacket;
 
 class PacketWriter implements Runnable {
 
-	private final BlockingQueue<Packet> queue;
 	private final PacketOutputStream out;
+	private final BlockingQueue<Packet> queue;
+	private final HandlerRef ref;
 
-	public PacketWriter(BlockingQueue<Packet> queue, OutputStream out) {
-		this.queue = Objects.requireNonNull(queue, "queue must not be null.");
-		this.out = new PacketOutputStream(out);
+	public PacketWriter(Connection connection, BlockingQueue<Packet> queue, HandlerRef ref) throws IOException {
+		this.out = new PacketOutputStream(connection.getOutputStream());
+		this.queue = queue;
+		this.ref = ref;
 	}
 
 	@Override
@@ -30,11 +31,10 @@ class PacketWriter implements Runnable {
 				packet = queue.take();
 				out.write(packet);
 			} while (!(packet instanceof DisconnectPacket));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			ref.submitException(e);
+		} catch (InterruptedException ignored) {}
+		// Do not close out, because it is part of a connection.
 	}
 
 	private void sendVersionCheckRequest() throws IOException {

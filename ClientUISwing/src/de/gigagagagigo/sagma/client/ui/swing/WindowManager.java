@@ -3,13 +3,14 @@ package de.gigagagagigo.sagma.client.ui.swing;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.SwingUtilities;
+import javax.swing.JOptionPane;
 
+import de.gigagagagigo.sagma.client.Handler;
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packets.*;
 
-public class WindowManager {
+public class WindowManager implements Handler {
 
 	private final SagMaClient client;
 	private final String username;
@@ -20,44 +21,52 @@ public class WindowManager {
 	public WindowManager(SagMaClient client, String username) {
 		this.client = client;
 		this.username = username;
-		this.client.setPacketHandler(this::handlePacket);
-		SwingUtilities.invokeLater(() -> list = new ListFrame(this));
+		this.client.setHandler(this);
+		this.list = new ListFrame(this);
+	}
+
+	@Override
+	public void handlePacket(Packet packet) {
+		if (packet instanceof UserListUpdatePacket) {
+			UserListUpdatePacket update = (UserListUpdatePacket) packet;
+			if (list != null)
+				list.handleUserListUpdate(update);
+		} else if (packet instanceof GroupListUpdatePacket) {
+			GroupListUpdatePacket update = (GroupListUpdatePacket) packet;
+			if (list != null)
+				list.handleGroupListUpdate(update);
+		} else if (packet instanceof MemberListUpdatePacket) {
+			MemberListUpdatePacket update = (MemberListUpdatePacket) packet;
+			if (groups.containsKey(update.groupName))
+				groups.get(update.groupName).handleMemberListUpdate(update);
+		} else if (packet instanceof MessagePacket) {
+			MessagePacket message = (MessagePacket) packet;
+			String groupName = message.groupName;
+			if (groupName == null) {
+				getChatFrame(message.userName).handleChatMessage(message);
+			} else if (groups.containsKey(groupName)) {
+				groups.get(groupName).handleChatMessage(message);
+			}
+		}
+	}
+
+	@Override
+	public void handleException(Exception exception) {
+		for (ChatFrame chat : chats.values())
+			chat.dispose();
+		for (GroupFrame group : groups.values())
+			group.dispose();
+		if (list != null)
+			list.dispose();
+		JOptionPane.showMessageDialog(
+			null,
+			"Die Verbindung zum Server wurde unterbrochen!",
+			"Fehler!",
+			JOptionPane.ERROR_MESSAGE);
 	}
 
 	public String getUsername() {
 		return username;
-	}
-
-	private void handlePacket(Packet packet) {
-		if (packet instanceof UserListUpdatePacket) {
-			UserListUpdatePacket update = (UserListUpdatePacket) packet;
-			SwingUtilities.invokeLater(() -> {
-				if (list != null)
-					list.handleUserListUpdate(update);
-			});
-		} else if (packet instanceof GroupListUpdatePacket) {
-			GroupListUpdatePacket update = (GroupListUpdatePacket) packet;
-			SwingUtilities.invokeLater(() -> {
-				if (list != null)
-					list.handleGroupListUpdate(update);
-			});
-		} else if (packet instanceof MemberListUpdatePacket) {
-			MemberListUpdatePacket update = (MemberListUpdatePacket) packet;
-			SwingUtilities.invokeLater(() -> {
-				if (groups.containsKey(update.groupName))
-					groups.get(update.groupName).handleMemberListUpdate(update);
-			});
-		} else if (packet instanceof MessagePacket) {
-			MessagePacket message = (MessagePacket) packet;
-			SwingUtilities.invokeLater(() -> {
-				String groupName = message.groupName;
-				if (groupName == null) {
-					getChatFrame(message.userName).handleChatMessage(message);
-				} else if (groups.containsKey(groupName)) {
-					groups.get(groupName).handleChatMessage(message);
-				}
-			});
-		}
 	}
 
 	public void sendPacket(Packet packet) {

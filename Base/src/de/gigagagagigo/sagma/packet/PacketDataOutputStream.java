@@ -1,14 +1,13 @@
 package de.gigagagagigo.sagma.packet;
 
 import java.io.*;
-import java.util.Objects;
 
 public class PacketDataOutputStream implements AutoCloseable {
 
 	private final DataOutputStream out;
 
 	public PacketDataOutputStream(OutputStream out) {
-		this.out = new DataOutputStream(Objects.requireNonNull(out, "out must not be null."));
+		this.out = new DataOutputStream(out);
 	}
 
 	public void writeBoolean(boolean data) throws IOException {

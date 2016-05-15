@@ -1,6 +1,8 @@
 package de.gigagagagigo.sagma.client;
 
-public class IncompatibleProtocolVersionException extends Exception {
+import java.io.IOException;
+
+public class IncompatibleProtocolVersionException extends IOException {
 
 	private final int clientVersion, serverVersion;
 

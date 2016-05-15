@@ -3,6 +3,7 @@ package de.gigagagagigo.sagma.client.ui.fxml.controller;
 import java.io.IOException;
 import java.util.*;
 
+import de.gigagagagigo.sagma.client.Handler;
 import de.gigagagagigo.sagma.client.SagMaClient;
 import de.gigagagagigo.sagma.client.ui.fxml.ChatPane;
 import de.gigagagagigo.sagma.client.ui.fxml.Main;
@@ -27,11 +28,11 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 /**
  * Controller for FXML-File chat.fxml
- *
  */
-public class ChatController {
+public class ChatController implements Handler {
 
 	private String username;
 	private SagMaClient client;
@@ -41,36 +42,26 @@ public class ChatController {
 	private final ObservableList<ActiveChatCell> activeChatsCells = FXCollections.observableArrayList();
 
 	TreeItem<String> tiUsers;
-	@FXML
-	private ResourceBundle resources;
-	@FXML
-	private TreeView<String> userTree;
-	@FXML
-	private TreeItem<String> treeRoot;
-	@FXML
-	private ListView<ActiveChatCell> activeChatsList;
-	@FXML
-	private AnchorPane messagePane;
-	@FXML
-	private Button bSend;
-	@FXML
-	private TextArea sendTextArea;
-	@FXML
-	private Label activeChatsLabel;
-	@FXML
-	private Label userLabel;
-	@FXML
-	private Menu mSagMa, mActions, mHelp;
-	@FXML
-	private MenuItem miClose, miNameChange, miStatus, miNewGroup, miLogOut, miChangeLanguage, miOptions, miAbout, miTerms;
+	@FXML private ResourceBundle resources;
+	@FXML private TreeView<String> userTree;
+	@FXML private TreeItem<String> treeRoot;
+	@FXML private ListView<ActiveChatCell> activeChatsList;
+	@FXML private AnchorPane messagePane;
+	@FXML private Button bSend;
+	@FXML private TextArea sendTextArea;
+	@FXML private Label activeChatsLabel;
+	@FXML private Label userLabel;
+	@FXML private Menu mSagMa, mActions, mHelp;
+	@FXML private MenuItem miClose, miNameChange, miStatus, miNewGroup, miLogOut, miChangeLanguage, miOptions,
+		miAbout, miTerms;
 
 	private TreeItem<String> userTreeItem, groupTreeItem;
-	
+
 	public ChatController(SagMaClient client, String username) {
 		this.client = client;
 		this.username = username;
-		language = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat",
-				new Locale("en", "EN"));
+		language = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat", new Locale(
+			"en", "EN"));
 	}
 
 	/**
@@ -79,43 +70,44 @@ public class ChatController {
 	@FXML
 	private void initialize() {
 
-		resources = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat",
-				new Locale("en", "EN"));
+		resources = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat", new Locale(
+			"en", "EN"));
 
 		activeChatsList.setItems(activeChatsCells);
 		sendTextArea.setWrapText(true);
 		userTreeItem = new TreeItem<String>(resources.getString("users"));
 		groupTreeItem = new TreeItem<String>(resources.getString("groups"));
-		
+
 		userTree.setRoot(treeRoot);
 		userTree.setShowRoot(false);
 		treeRoot.getChildren().addAll(userTreeItem, groupTreeItem);
 
 		userTree.setOnMouseClicked((e) -> {
 			if (e.getClickCount() == 2 && userTree.getSelectionModel().getSelectedItem().getValue() != null
-					&& userTree.getSelectionModel().getSelectedItem().getParent() != treeRoot){
+				&& userTree.getSelectionModel().getSelectedItem().getParent() != treeRoot) {
 				String selected = userTree.getSelectionModel().getSelectedItem().getValue();
-				
-				if(userTree.getSelectionModel().getSelectedItem().getParent() == groupTreeItem){
+
+				if (userTree.getSelectionModel().getSelectedItem().getParent() == groupTreeItem) {
 					openChatPane(getChatPane(selected, true), selected);
-				}else{
-					openChatPane(getChatPane(selected), selected);					
+				} else {
+					openChatPane(getChatPane(selected), selected);
 				}
 			}
 		});
 
-		activeChatsList.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<ActiveChatCell>() {
-			@Override
-			public void changed(ObservableValue<? extends ActiveChatCell> observable, ActiveChatCell oldPartner,
-					ActiveChatCell newPartner) {
-				if (newPartner != null) {
-					if (!activeChats.isEmpty()) {
-						openChatPane(getChatPane(newPartner.getPartner()), newPartner.getPartner());
+		activeChatsList.getSelectionModel().selectedItemProperty().addListener(
+			new ChangeListener<ActiveChatCell>() {
+				@Override
+				public void changed(ObservableValue<? extends ActiveChatCell> observable,
+					ActiveChatCell oldPartner, ActiveChatCell newPartner) {
+					if (newPartner != null) {
+						if (!activeChats.isEmpty()) {
+							openChatPane(getChatPane(newPartner.getPartner()), newPartner.getPartner());
+						}
+						newPartner.changeNewMessage(false);
 					}
-					newPartner.changeNewMessage(false);
 				}
-			}
-		});
+			});
 
 		sendTextArea.setOnKeyReleased((e) -> {
 			if (e.getCode().equals(KeyCode.ENTER) && e.isShiftDown()) {
@@ -125,11 +117,12 @@ public class ChatController {
 			}
 		});
 
-		this.client.setPacketHandler(this::handlePacket);
+		client.setHandler(this);
 	}
 
 	/**
 	 * opens the ChatPane for the given chat in the messagePane
+	 * 
 	 * @param pane ChatPane
 	 * @param partner String
 	 */
@@ -152,18 +145,18 @@ public class ChatController {
 	}
 
 	/**
-	 * Overloading methode for single user
-	 * calls getChatPane(String, boolean)
+	 * Overloading methode for single user calls getChatPane(String, boolean)
+	 * 
 	 * @param partner String
 	 * @return ChatPane
 	 */
-	private ChatPane getChatPane(String partner){
+	private ChatPane getChatPane(String partner) {
 		return getChatPane(partner, false);
 	}
-	
+
 	/**
-	 * creates a new ChatPane if the searched one does not exist
-	 * and/or returns the searched pane
+	 * creates a new ChatPane if the searched one does not exist and/or returns the searched pane
+	 * 
 	 * @param partner String
 	 * @param isGroup boolean
 	 * @return ChatPane
@@ -201,6 +194,7 @@ public class ChatController {
 
 	/**
 	 * closes the selected ChatPane and remove the chat from the lists
+	 * 
 	 * @param partner String
 	 */
 	public void closeChatPane(String partner) {
@@ -214,6 +208,7 @@ public class ChatController {
 
 	/**
 	 * returns the ActiveChatCell for the given partner
+	 * 
 	 * @param partner String
 	 * @return ActiveChatCell
 	 */
@@ -227,8 +222,8 @@ public class ChatController {
 	}
 
 	/**
-	 * validates the message to be send and sends a new messagePacket to the server
-	 * appends the message to the own messagePane
+	 * validates the message to be send and sends a new messagePacket to the server appends the message to the
+	 * own messagePane
 	 */
 	public void sendMessage() {
 		if (activeChatsList.getSelectionModel().getSelectedItem() != null) {
@@ -256,24 +251,32 @@ public class ChatController {
 	 */
 
 	/**
-	 *	handles all incoming packets and calls the specific method
+	 * handles all incoming packets and calls the specific method
+	 * 
 	 * @param packet Packet
 	 */
-	private void handlePacket(Packet packet) {
+	@Override
+	public void handlePacket(Packet packet) {
 		if (packet instanceof UserListUpdatePacket) {
 			UserListUpdatePacket update = (UserListUpdatePacket) packet;
-			Platform.runLater(() -> handleUserListUpdate(update));
+			handleUserListUpdate(update);
 		} else if (packet instanceof GroupListUpdatePacket) {
 			GroupListUpdatePacket update = (GroupListUpdatePacket) packet;
-			Platform.runLater(() -> handleGroupListUpdate(update));
+			handleGroupListUpdate(update);
 		} else if (packet instanceof MessagePacket) {
 			MessagePacket message = (MessagePacket) packet;
-			Platform.runLater(() -> newMessage(message));
+			newMessage(message);
 		}
+	}
+
+	@Override
+	public void handleException(Exception exception) {
+		Platform.exit();
 	}
 
 	/**
 	 * handles incoming messages and appends it to the chat
+	 * 
 	 * @param message MessagePacket
 	 */
 	private void newMessage(MessagePacket message) {
@@ -296,9 +299,10 @@ public class ChatController {
 		}
 
 	}
-	
+
 	/**
 	 * sends a packet
+	 * 
 	 * @param packet Packet
 	 */
 	public void sendPacket(Packet packet) {
@@ -307,6 +311,7 @@ public class ChatController {
 
 	/**
 	 * handles UserListUpdatePackets to refresh the userlist if any changes appear
+	 * 
 	 * @param update UserListUpdatePacket
 	 */
 	private void handleUserListUpdate(UserListUpdatePacket update) {
@@ -325,6 +330,7 @@ public class ChatController {
 
 	/**
 	 * handles GroupListUpdatePackets to refresh the grouplist if any changes appear
+	 * 
 	 * @param update GroupListUpdatePacket
 	 */
 	private void handleGroupListUpdate(GroupListUpdatePacket update) {
@@ -340,43 +346,43 @@ public class ChatController {
 			}
 		}
 	}
-	
+
 	/**
 	 * opens a new dialog window for the user to create a new chat group
 	 */
-	public void newGroup(){
+	public void newGroup() {
 		Stage newGroupStage = new Stage();
 		newGroupStage.initModality(Modality.WINDOW_MODAL);
 		newGroupStage.initOwner(messagePane.getScene().getWindow());
-		
+
 		HBox box = new HBox();
 		box.getStyleClass().add("newGroup");
 		TextField tfName = new TextField();
 		Button bGroupOK = new Button(language.getString("create"));
-		bGroupOK.setOnAction(e ->{
-			if(!tfName.getText().trim().isEmpty()){
+		bGroupOK.setOnAction(e -> {
+			if (!tfName.getText().trim().isEmpty()) {
 				createGroup(tfName.getText().trim());
 				newGroupStage.close();
-			}
-			else{
+			} else {
 				tfName.getStyleClass().add("validateError");
 			}
 		});
 		box.getChildren().add(new Label(language.getString("groupName")));
 		box.getChildren().add(tfName);
 		box.getChildren().add(bGroupOK);
-		
+
 		Scene scene = new Scene(box);
 		scene.getStylesheets().add(Main.class.getResource("blackstyle.css").toExternalForm());
 		newGroupStage.setScene(scene);
 		newGroupStage.show();
 	}
-	
+
 	/**
 	 * creates the new group
+	 * 
 	 * @param name String
 	 */
-	private void createGroup(String name){
+	private void createGroup(String name) {
 		openChatPane(getChatPane(name, true), name);
 	}
 
@@ -393,30 +399,32 @@ public class ChatController {
 
 	/**
 	 * sends the locale to the editText method to change the language
+	 * 
 	 * @param e ActionEvent
 	 */
 	public void changeLanguage(ActionEvent e) {
 		Locale locale = new Locale("en", "EN");
 		switch (((MenuItem) e.getSource()).getText()) {
 
-		case "DE":
-			locale = new Locale("de", "DE");
-			break;
-		case "EN":
-			locale = new Locale("en", "EN");
-			break;
-		case "RU":
-			locale = new Locale("ru", "RU");
-			break;
+			case "DE":
+				locale = new Locale("de", "DE");
+				break;
+			case "EN":
+				locale = new Locale("en", "EN");
+				break;
+			case "RU":
+				locale = new Locale("ru", "RU");
+				break;
 		}
 		editText(locale);
 	}
-	
+
 	/**
 	 * change the text of all fields to the new locale
+	 * 
 	 * @param locale Locale
 	 */
-	private void editText(Locale locale){
+	private void editText(Locale locale) {
 		language = ResourceBundle.getBundle("de.gigagagagigo.sagma.client.ui.fxml.language.chat", locale);
 		activeChatsLabel.setText(language.getString("activeList"));
 		userLabel.setText(language.getString("userList"));
@@ -431,14 +439,15 @@ public class ChatController {
 		miTerms.setText(language.getString("miTerms"));
 		userTreeItem.setValue(language.getString("users"));
 		groupTreeItem.setValue(language.getString("groups"));
-		
+
 	}
 
 	/**
 	 * shows a new window with the about us text
 	 */
 	public void showAbout() {
-		FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/About.fxml"));
+		FXMLLoader loader = new FXMLLoader(Main.class.getResource(
+			"/de/gigagagagigo/sagma/client/ui/fxml/About.fxml"));
 		showNewWindow(loader);
 	}
 
@@ -446,13 +455,15 @@ public class ChatController {
 	 * shows a new window with the terms
 	 */
 	public void showTerms() {
-		FXMLLoader loader = new FXMLLoader(Main.class.getResource("/de/gigagagagigo/sagma/client/ui/fxml/About.fxml"));
+		FXMLLoader loader = new FXMLLoader(Main.class.getResource(
+			"/de/gigagagagigo/sagma/client/ui/fxml/About.fxml"));
 		showNewWindow(loader);
 
 	}
 
 	/**
 	 * shows a new window for about and terms
+	 * 
 	 * @param loader FXMLLoader
 	 */
 	private void showNewWindow(FXMLLoader loader) {
@@ -474,9 +485,8 @@ public class ChatController {
 	}
 
 	/**
-	 * ListItem for active Chats It contains a region for showing that unread
-	 * messages exists, a label for the partner and a delete button
-	 *
+	 * ListItem for active Chats It contains a region for showing that unread messages exists, a label for the
+	 * partner and a delete button
 	 */
 	public static class ActiveChatCell extends HBox {
 		boolean isGroup;
@@ -492,10 +502,10 @@ public class ChatController {
 			this.button = button;
 			this.partner = partner;
 			this.setMaxHeight(10);
-			if(isGroup){
+			if (isGroup) {
 				chatIcon = new Image(getClass().getResourceAsStream("../img/group.png"));
-			}else{
-				chatIcon = new Image(getClass().getResourceAsStream("../img/person.png"));				
+			} else {
+				chatIcon = new Image(getClass().getResourceAsStream("../img/person.png"));
 			}
 			ImageView iconView = new ImageView(chatIcon);
 			iconView.setFitHeight(5);
@@ -503,7 +513,7 @@ public class ChatController {
 			lPartner.setMaxWidth(Double.MAX_VALUE);
 			lPartner.getStyleClass().add("unreadMessage");
 			HBox.setHgrow(lPartner, Priority.ALWAYS);
-//			button.prefWidthProperty().bind(button.heightProperty());
+			// button.prefWidthProperty().bind(button.heightProperty());
 			button.setText("X");
 			button.getStyleClass().add("deleteButton");
 
@@ -519,6 +529,7 @@ public class ChatController {
 
 		/**
 		 * if an unread message exist the text signals this event
+		 * 
 		 * @param isNew boolean
 		 */
 		public void changeNewMessage(boolean isNew) {
@@ -533,6 +544,7 @@ public class ChatController {
 
 		/**
 		 * returns the partner
+		 * 
 		 * @return String
 		 */
 		public String getPartner() {
@@ -541,17 +553,19 @@ public class ChatController {
 
 		/**
 		 * returns the deleteButton
+		 * 
 		 * @return Button
 		 */
 		public Button getButton() {
 			return button;
 		}
-		
+
 		/**
 		 * retrns wether the chat is a group chat or not
+		 * 
 		 * @return boolean
 		 */
-		public boolean isGroup(){
+		public boolean isGroup() {
 			return isGroup;
 		}
 	}

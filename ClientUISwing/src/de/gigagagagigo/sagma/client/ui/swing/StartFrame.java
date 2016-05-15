@@ -6,17 +6,21 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.EmptyBorder;
 
+import de.gigagagagigo.sagma.client.Handler;
 import de.gigagagagigo.sagma.client.SagMaClient;
+import de.gigagagagigo.sagma.packet.Packet;
 import de.gigagagagigo.sagma.packets.AuthReplyPacket;
 import de.gigagagagigo.sagma.packets.AuthRequestPacket;
 
-public class StartFrame extends JFrame {
+public class StartFrame extends JFrame implements Handler {
 
 	private JTextField server = new JTextField(20);
 	private JTextField username = new JTextField(20);
 	private JPasswordField password = new JPasswordField(20);
 	private JButton logIn = new JButton("Einloggen");
 	private JButton register = new JButton("Registrieren");
+
+	private SagMaClient client;
 	private AuthRequestPacket request;
 
 	public StartFrame() {
@@ -76,31 +80,8 @@ public class StartFrame extends JFrame {
 		if (logIn.isEnabled()) {
 			logIn.setEnabled(false);
 			register.setEnabled(false);
-			SagMaClient client = new SagMaClient();
-			client.setPacketHandler(p -> {
-				if (p instanceof AuthReplyPacket) {
-					AuthReplyPacket reply = (AuthReplyPacket) p;
-					if (reply.success) {
-						SwingUtilities.invokeLater(() -> dispose());
-						new WindowManager(client, request.username);
-					} else {
-						SwingUtilities.invokeLater(() -> {
-							JOptionPane.showMessageDialog(
-								this,
-								"Der Server hat die Anmeldedaten nicht akzeptiert.",
-								"Fehler!",
-								JOptionPane.ERROR_MESSAGE);
-							logIn.setEnabled(true);
-							register.setEnabled(true);
-						});
-					}
-				} else {
-					SwingUtilities.invokeLater(() -> {
-						logIn.setEnabled(true);
-						register.setEnabled(true);
-					});
-				}
-			});
+			client = new SagMaClient(SwingUtilities::invokeLater);
+			client.setHandler(this);
 			client.start(server.getText());
 			request = new AuthRequestPacket();
 			request.username = username.getText();
@@ -108,6 +89,34 @@ public class StartFrame extends JFrame {
 			request.register = doRegister;
 			client.sendPacket(request);
 		}
+	}
+
+	@Override
+	public void handlePacket(Packet packet) {
+		AuthReplyPacket reply = (AuthReplyPacket) packet;
+		if (reply.success) {
+			dispose();
+			new WindowManager(client, request.username);
+		} else {
+			JOptionPane.showMessageDialog(
+				this,
+				"Der Server hat die Anmeldedaten nicht akzeptiert.",
+				"Warnung!",
+				JOptionPane.WARNING_MESSAGE);
+			logIn.setEnabled(true);
+			register.setEnabled(true);
+		}
+	}
+
+	@Override
+	public void handleException(Exception exception) {
+		JOptionPane.showMessageDialog(
+			this,
+			"Bei der Verbindungsherstellung ist ein Fehler aufgetreten.",
+			"Fehler!",
+			JOptionPane.ERROR_MESSAGE);
+		logIn.setEnabled(true);
+		register.setEnabled(true);
 	}
 
 }

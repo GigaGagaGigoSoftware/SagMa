@@ -11,19 +11,29 @@ import de.gigagagagigo.sagma.packet.Packet;
 
 public class SagMaClient {
 
-	private final BlockingQueue<Packet> queue = new LinkedBlockingQueue<>();
-	private final HandlerRef ref = new HandlerRef();
+	private final BlockingQueue<Packet> queue;
+	private final HandlerRef ref;
+
+	public SagMaClient(RunnableExecutor executor) {
+		queue = new LinkedBlockingQueue<>();
+		ref = new HandlerRef(executor);
+	}
 
 	public void start(String server) {
 		new Thread(() -> {
 			try {
-				// Do not close the connection here, because we are starting the server.
-				// The connection will be closed if one of the io streams created here is closed.
 				Connection connection = NetworkFactories.get().openConnection(server, SagMa.PORT);
-				new Thread(new PacketWriter(queue, connection.getOutputStream())).start();
-				new Thread(new PacketReader(connection.getInputStream(), ref)).start();
+				Thread writer = new Thread(new PacketWriter(connection, queue, ref));
+				Thread reader = new Thread(new PacketReader(connection, writer, ref));
+				writer.start();
+				reader.start();
+				try {
+					writer.join();
+					reader.join();
+				} catch (InterruptedException ignored) {}
+				connection.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				ref.submitException(e);
 			}
 		}).start();
 	}
@@ -32,7 +42,7 @@ public class SagMaClient {
 		queue.add(packet);
 	}
 
-	public void setPacketHandler(PacketHandler handler) {
+	public void setHandler(Handler handler) {
 		ref.setHander(handler);
 	}
 

@@ -46,6 +46,7 @@ public class Main extends Application {
 		try {
 
 			Stage primaryStage = new Stage();
+			primaryStage.getIcons().addAll(new Image(Main.class.getResourceAsStream("img/SagMaIcon64.png")),new Image(Main.class.getResourceAsStream("img/SagMaIcon16.png")));
 			primaryStage.setTitle("SagMa");
 			primaryStage.setMinHeight(550);
 			primaryStage.setMinWidth(350);
@@ -76,6 +77,7 @@ public class Main extends Application {
 			loader.setResources(language);
 			GridPane root = loader.load(getClass().getResource("LogIn.fxml").openStream());
 			Stage loginStage = new Stage();
+			loginStage.getIcons().addAll(new Image(getClass().getResourceAsStream("img/SagMaIcon64.png")),new Image(getClass().getResourceAsStream("img/SagMaIcon16.png")));
 			loginStage.setTitle("Log In");
 			loginStage.initModality(Modality.WINDOW_MODAL);
 			loginStage.initOwner(primaryStage);

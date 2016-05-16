@@ -203,6 +203,14 @@ public class ChatController implements Handler {
 		}
 		chats.remove(partner);
 		activeChats.remove(partner);
+		if(getActiveChatCell(partner).isGroup){
+			for(TreeItem<String> group : groupTreeItem.getChildren()){
+				if(group.getValue().equals(partner)){
+					group.getChildren().clear();
+					break;
+				}
+			}
+		}
 		activeChatsCells.remove(getActiveChatCell(partner));
 	}
 
@@ -266,6 +274,9 @@ public class ChatController implements Handler {
 		} else if (packet instanceof MessagePacket) {
 			MessagePacket message = (MessagePacket) packet;
 			newMessage(message);
+		} else if (packet instanceof MemberListUpdatePacket){
+			MemberListUpdatePacket update = (MemberListUpdatePacket) packet;
+			handleMemberListUpdate(update);
 		}
 	}
 
@@ -346,6 +357,29 @@ public class ChatController implements Handler {
 			}
 		}
 	}
+	
+	private void handleMemberListUpdate(MemberListUpdatePacket update){
+		if(update.removed != null){
+			for(TreeItem<String> group : groupTreeItem.getChildren()){
+				if(group.getValue().equals(update.groupName)){
+					for(String user : update.removed){
+						group.getChildren().removeIf(item -> item.getValue().equals(user));
+					}
+					break;
+				}
+			}
+		}
+		if(update.added != null){
+			for(TreeItem<String> group : groupTreeItem.getChildren()){
+				if(group.getValue().equals(update.groupName)){
+					for(String user : update.added){
+						group.getChildren().add(new TreeItem<String>(user));
+					}
+					break;
+				}
+			}
+		}
+	}
 
 	/**
 	 * opens a new dialog window for the user to create a new chat group
@@ -394,6 +428,7 @@ public class ChatController implements Handler {
 	 * closes the window
 	 */
 	public void close() {
+		client.sendPacket(new DisconnectPacket());
 		Platform.exit();
 	}
 

@@ -50,7 +50,7 @@ public class ServerFrame extends JFrame {
 				}
 			});
 
-			setSize(300, 200);
+			setSize(500, 200);
 			setMinimumSize(getSize());
 			setLocationRelativeTo(null);
 			setTitle("SagMa Server");

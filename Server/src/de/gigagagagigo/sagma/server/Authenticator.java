@@ -7,7 +7,7 @@ import java.util.Arrays;
 import org.bouncycastle.crypto.generators.SCrypt;
 
 import de.gigagagagigo.sagma.server.authstore.AuthStore;
-import de.gigagagagigo.sagma.server.authstore.InMemoryAuthStore;
+import de.gigagagagigo.sagma.server.authstore.FileAuthStore;
 
 public class Authenticator {
 
@@ -17,7 +17,7 @@ public class Authenticator {
 	private final static int SCRYPT_R = 8;
 	private final static int SCRYPT_P = 1;
 
-	private final AuthStore store = new InMemoryAuthStore();
+	private final AuthStore store = new FileAuthStore("sagma.auth");
 
 	public boolean register(String username, String password) {
 		if (store.hasUser(username) || password.isEmpty())

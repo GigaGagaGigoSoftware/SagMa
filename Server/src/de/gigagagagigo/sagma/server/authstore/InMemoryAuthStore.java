@@ -5,8 +5,8 @@ import java.util.Map;
 
 public class InMemoryAuthStore implements AuthStore {
 
-	private final Map<String, byte[]> salts = new HashMap<>();
-	private final Map<String, byte[]> hashes = new HashMap<>();
+	protected final Map<String, byte[]> salts = new HashMap<>();
+	protected final Map<String, byte[]> hashes = new HashMap<>();
 
 	@Override
 	public boolean hasUser(String username) {

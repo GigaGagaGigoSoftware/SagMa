@@ -33,6 +33,7 @@ class PacketReader implements Runnable {
 			}
 		} catch (IOException e) {
 			ref.submitException(e);
+		} finally {
 			writer.interrupt();
 		}
 		// Do not close in, because it is part of a connection.

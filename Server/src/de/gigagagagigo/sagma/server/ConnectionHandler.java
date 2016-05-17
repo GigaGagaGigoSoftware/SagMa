@@ -1,5 +1,7 @@
 package de.gigagagagigo.sagma.server;
 
+import static de.gigagagagigo.sagma.packets.AuthReplyPacket.*;
+
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -59,24 +61,24 @@ public class ConnectionHandler implements Runnable {
 
 	private boolean authenticate() throws IOException {
 		AuthRequestPacket request = in.read(AuthRequestPacket.class);
-		boolean success = server.addHandler(request.username, request.password, request.register, this);
-		if (success)
+		int status = server.addHandler(request.username, request.password, request.register, this);
+		if (status == STATUS_OK)
 			this.username = request.username;
 		AuthReplyPacket reply = new AuthReplyPacket();
-		reply.success = success;
+		reply.status = status;
 		out.write(reply);
-		if (success) {
+		if (status == STATUS_OK) {
 			UserListUpdatePacket update = new UserListUpdatePacket();
 			update.added = getCustomUserList();
 			out.write(update);
 			GroupListUpdatePacket groupUpdate = new GroupListUpdatePacket();
 			groupUpdate.added = server.getGroups();
 			out.write(groupUpdate);
+			new Thread(new Writer()).start();
 		} else {
 			out.write(new DisconnectPacket());
 		}
-		new Thread(new Writer()).start();
-		return success;
+		return status == STATUS_OK;
 	}
 
 	private void listen() throws IOException {

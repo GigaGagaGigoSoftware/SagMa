@@ -1,5 +1,7 @@
 package de.gigagagagigo.sagma.client.ui.fxml.controller;
 
+import static de.gigagagagigo.sagma.packets.AuthReplyPacket.*;
+
 import java.util.ResourceBundle;
 
 import de.gigagagagigo.sagma.client.Handler;
@@ -11,6 +13,7 @@ import de.gigagagagigo.sagma.packets.AuthRequestPacket;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class LogInController implements Handler {
@@ -107,17 +110,45 @@ public class LogInController implements Handler {
 	@Override
 	public void handlePacket(Packet packet) {
 		AuthReplyPacket reply = (AuthReplyPacket) packet;
-		if (reply.success) {
+		if (reply.status == STATUS_OK) {
 			client.setHandler(null);
 			closeWindow();
 			Main.showChat(client, request.username);
 		} else {
+			String message;
+			switch (reply.status) {
+				case STATUS_INVALID_CREDENTIALS:
+					message = "Benutzername oder Passwort ist falsch.";
+					break;
+				case STATUS_ALREADY_LOGGED_IN:
+					message = "Sie sind bereits angemeldet. Bitte melden Sie sich zuerst ab, bevor Sie sich erneut anmelden.";
+					break;
+				case STATUS_USERNAME_TAKEN:
+					message = "Der Benutzername ist bereits vergeben.";
+					break;
+				case STATUS_INVALID_PASSWORD:
+					message = "Das Passwort ist ungültig.";
+					break;
+				default:
+					message = "Der Server hat die Anmeldedaten nicht akzeptiert.";
+					break;
+			}
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warnung!");
+			alert.setHeaderText(null);
+			alert.setContentText(message);
+			alert.showAndWait();
 			changeButtonAccess();
 		}
 	}
 
 	@Override
 	public void handleException(Exception exception) {
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("Fehler!");
+		alert.setHeaderText(null);
+		alert.setContentText("Bei der Verbindungsherstellung ist ein Fehler aufgetreten.");
+		alert.showAndWait();
 		changeButtonAccess();
 	}
 

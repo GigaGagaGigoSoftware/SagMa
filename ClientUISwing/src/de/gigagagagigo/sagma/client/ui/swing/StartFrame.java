@@ -1,5 +1,6 @@
 package de.gigagagagigo.sagma.client.ui.swing;
 
+import static de.gigagagagigo.sagma.packets.AuthReplyPacket.*;
 import static javax.swing.GroupLayout.*;
 
 import javax.swing.*;
@@ -94,15 +95,29 @@ public class StartFrame extends JFrame implements Handler {
 	@Override
 	public void handlePacket(Packet packet) {
 		AuthReplyPacket reply = (AuthReplyPacket) packet;
-		if (reply.success) {
+		if (reply.status == STATUS_OK) {
 			dispose();
 			new WindowManager(client, request.username);
 		} else {
-			JOptionPane.showMessageDialog(
-				this,
-				"Der Server hat die Anmeldedaten nicht akzeptiert.",
-				"Warnung!",
-				JOptionPane.WARNING_MESSAGE);
+			String message;
+			switch (reply.status) {
+				case STATUS_INVALID_CREDENTIALS:
+					message = "Benutzername oder Passwort ist falsch.";
+					break;
+				case STATUS_ALREADY_LOGGED_IN:
+					message = "Sie sind bereits angemeldet. Bitte melden Sie sich zuerst ab, bevor Sie sich erneut anmelden.";
+					break;
+				case STATUS_USERNAME_TAKEN:
+					message = "Der Benutzername ist bereits vergeben.";
+					break;
+				case STATUS_INVALID_PASSWORD:
+					message = "Das Passwort ist ungültig.";
+					break;
+				default:
+					message = "Der Server hat die Anmeldedaten nicht akzeptiert.";
+					break;
+			}
+			JOptionPane.showMessageDialog(this, message, "Warnung!", JOptionPane.WARNING_MESSAGE);
 			logIn.setEnabled(true);
 			register.setEnabled(true);
 		}

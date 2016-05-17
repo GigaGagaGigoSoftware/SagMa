@@ -1,5 +1,7 @@
 package de.gigagagagigo.sagma.server;
 
+import static de.gigagagagigo.sagma.packets.AuthReplyPacket.*;
+
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -19,23 +21,25 @@ public class Authenticator {
 
 	private final AuthStore store = new FileAuthStore("sagma.auth");
 
-	public boolean register(String username, String password) {
-		if (store.hasUser(username) || password.isEmpty())
-			return false;
+	public int register(String username, String password) {
+		if (store.hasUser(username))
+			return STATUS_USERNAME_TAKEN;
+		if (password.isEmpty())
+			return STATUS_INVALID_PASSWORD;
 		SecureRandom random = new SecureRandom();
 		byte[] salt = random.generateSeed(SALT_BYTES);
 		byte[] hash = generateHash(password, salt);
 		store.addUser(username, salt, hash);
-		return true;
+		return STATUS_OK;
 	}
 
-	public boolean logIn(String username, String password) {
+	public int logIn(String username, String password) {
 		if (!store.hasUser(username))
-			return false;
+			return STATUS_INVALID_CREDENTIALS;
 		byte[] salt = store.getSalt(username);
 		byte[] expected = store.getHash(username);
 		byte[] hash = generateHash(password, salt);
-		return Arrays.equals(hash, expected);
+		return Arrays.equals(hash, expected) ? STATUS_OK : STATUS_INVALID_CREDENTIALS;
 	}
 
 	private byte[] generateHash(String password, byte[] salt) {

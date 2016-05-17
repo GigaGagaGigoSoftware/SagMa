@@ -21,6 +21,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -282,6 +283,11 @@ public class ChatController implements Handler {
 
 	@Override
 	public void handleException(Exception exception) {
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle("Fehler!");
+		alert.setHeaderText(null);
+		alert.setContentText("Die Verbindung zum Server wurde unterbrochen!");
+		alert.showAndWait();
 		Platform.exit();
 	}
 

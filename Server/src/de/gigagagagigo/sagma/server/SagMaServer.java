@@ -1,5 +1,7 @@
 package de.gigagagagigo.sagma.server;
 
+import static de.gigagagagigo.sagma.packets.AuthReplyPacket.*;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
@@ -46,19 +48,37 @@ public class SagMaServer implements Runnable {
 		}
 	}
 
-	public synchronized boolean addHandler(String username, String password, boolean register,
-		ConnectionHandler handler) {
+	public synchronized int addHandler(String username, String password, boolean register, ConnectionHandler handler) {
+		if (register)
+			return registerHandler(username, password, handler);
+		else
+			return loginHandler(username, password, handler);
+	}
+
+	private int registerHandler(String username, String password, ConnectionHandler handler) {
 		if (activeHandlers.containsKey(username))
-			return false;
-		boolean success = register ? authenticator.register(username, password)
-			: authenticator.logIn(username, password);
-		if (success) {
+			return STATUS_USERNAME_TAKEN;
+		int status = authenticator.register(username, password);
+		updateUserListIfOk(status, username, handler);
+		return status;
+	}
+
+	private int loginHandler(String username, String password, ConnectionHandler handler) {
+		int status = authenticator.logIn(username, password);
+		// Only send the information that the user is logged in if they provided valid credentials.
+		if (status == STATUS_OK && activeHandlers.containsKey(username))
+			return STATUS_ALREADY_LOGGED_IN;
+		updateUserListIfOk(status, username, handler);
+		return status;
+	}
+
+	private void updateUserListIfOk(int status, String username, ConnectionHandler handler) {
+		if (status == STATUS_OK) {
 			UserListUpdatePacket update = new UserListUpdatePacket();
 			update.added = new String[] { username };
 			activeHandlers.values().forEach(h -> h.sendPacket(update));
 			activeHandlers.put(username, handler);
 		}
-		return success;
 	}
 
 	public synchronized void removeHandler(String userName) {

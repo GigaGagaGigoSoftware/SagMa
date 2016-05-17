@@ -11,6 +11,8 @@ public class LocalConnectionPoint implements ConnectionPoint {
 		void execute();
 	}
 
+	// Special marker object to indicate that the point
+	// has been closed and accept should throw an exception.
 	private static final Connection CLOSED = new Connection() {
 		@Override
 		public OutputStream getOutputStream() {

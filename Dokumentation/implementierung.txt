@@ -1,0 +1,220 @@
+Die Paketschicht
+
+Java's Socket API bietet die Möglichkeit Daten mittels IOStreams über ein Netzwerk zu verschicken. IOStreams arbeiten mit einzelnen Bytes, die meisten Anwendungen - SagMa eingeschlossen - arbeiten allerdings auf einem höheren Level. Die Paketschicht stellt die Schnittstelle zwischen den Bytes die über das Netzwerk verschickt werden und anwendungsspezifischen DTOs (Data Transfer Objects), sogenannten Paketen, dar.
+
+[[Packet.png]]
+
+Im Zentrum der Paketschicht steht das Packet-Interface. Die Anwendung definiert verschiedene Paketklassen, die das Packet-Interface implementieren. Dazu muss ein read() und eine write()-Methode definiert werden, die einen PacketDataInputStream bzw. PacketDataOutputStream erhalten. Die Daten-Streams sind Wrapper für Input- bzw. OutputStreams, die es erlauben alle primitiven Datentypen von Java sowie Strings und String-Arrays zu serialisieren (im UML-Diagramm wurden beispielhaft drei Methoden angegeben, die anderen wurden der Kürze halber nicht aufgeführt). Die Daten-Streams machen das Implementieren des Packet-Interfaces trivial.
+
+In der Geschäftslogik der Anwendung können nun verschiedene Paketklassen instanziiert und mit Hilfe des PacketOutputStreams verschickt werden. Auf der Empfängerseite können diese per PacketInputStream empfangen werden. Der Paket-Streams verwenden Reflection und die read() und write()-Methoden des Packet-Interfaces, um sicherzustellen, dass der PacketInputStream eine exakte Kopie des Objekts zurückgibt, dass der PacketOutputStream serialisiert hat.
+
+
+
+Die Netzwerkschicht
+
+Während der Entwicklung ist das Problem aufgetreten, dass ein Arbeitsrechner mit hohen Sicherheitseinstellungen das Java Socket API blockiert hat und dadurch das Ausführen und Testen der Anwendung nicht mehr möglich war. Um dieses Problem zu umgehen wurde die Netzwerkschicht aufgebaut, die von der tatsächlich verwendeten Netzwerktechnologie abstahiert und eine lokale Implementation entwickelt, die das Java Socket API nicht benötigt.
+
+[[Network.png]]
+
+Die Netzwerkschicht folgt dem Entwurfsmuster der Abstrakten Fabrik. Der Chatserver möchte auf Verbindungen warten. Diese Funktionalität wird durch das Interface ConnectionPoint bereitgestellt. Wenn eine neue Verbindung bereit ist, wird ein Objekt erzeugt, dass das Connection-Interface implementiert. Dieses erlaubt die Kommunikation über zwei IOStreams. Der Chatclient benutzt ebenfalls das Connection-Interface um mit dem Chatserver zu kommunizieren. Um die entsprechenden Connection- und ConnectionPoint-Objekte zu erzeugen rufen sowohl der Client als auch der Server Methoden auf einer statischen Variable vom Typ NetworkFactory auf. NetworkFactory ist selbst wieder ein Interface, das von den Klassen LocalNetworkFactory und SocketNetworkFactory implementiert wird. Diese Klassen erzeugen jeweils Objekte vom Typ LocalConnection bzw. LocalConnectionPoint und SocketConnection bzw. SocketConnectionPoint.
+
+Je nach dem ob die statische Variable auf eine LocalNetworkFactory oder eine SocketNetworkFactory zeigt, werden immer nur lokale Connection-Objekte oder nur socketbasierte Connection-Objekte erzeugt.
+
+Die Input- und OutputStreams der lokalen Connection-Objekte sind direkt miteinander verknüpft. Deshalb wird die Socket API nicht benötigt, es können aber nur Verbindungen innerhalb der gleichen virtuellen Maschine von Java erstellt werden. Dies ist für den normalen Gebrauch natürlich nicht geeignet, zum Testen muss aber nur eine lokale NetworkFactory eingerichtet und dann Server und Client in der gleichen JVM gestartet werden.
+
+
+
+Das Authentifizierungssystem
+
+Das Authentifizierungssystem überprüft und speichert Passwörter. Um die Sicherheit der Benutzer zu gewährleisten werden die Passwörter zusammen mit einem Salt gehasht und nur der Hashwert abgespeichert.
+
+[[Auth.png]]
+
+Die Klasse Authenticator stellt den Einstiegspunkt zu dem Authentifizierungssystem dar und ist für die Überprüfung der Passwörter inklusive Hashgenerierung verantwortlich. Die Speicherung der Hashwerte wird an das Interface AuthStore delegiert.
+
+Authenticator stellt die Methoden register() und logIn() zur Verfügung, die jeweils einen Benutzernamen und ein Passwort annehmen und einen Statuscode als Ganzzahl zurückgeben (da dieser Statuscode serialisiert werden soll, wurden hier Ganzzahlkonstanten einem Enum vorgezogen).
+
+Zur Hashwertbildung wurde die Bouncy Castle Crypto API eingebunden. Bouncy Castle ist eine bekannte Open Source Implementierung von Verschlüsselungsalgorithmen in Java und C#. Bei kryptografischen Algorithmen ist es vorzuziehen eine öffentliche Implementation einzubinden anstatt den Algorithmus selber zu programmieren, da so sichergestellt ist, dass in der Implementation keine Schwachstellen vorhanden sind, da der Source Code von vielen verschiedenen Programmierern und Experten eingesehen und kontroliert werden kann.
+
+Es wird der SCrypt-Algorithmus verwendet um die Hashwerte zu berechnen. Dieser Algorithmus wird zur Berechnung von Hashwerten aus Passwörtern empfohlen, da sowohl sowohl Rechenaufwand als auch Speicherverbrauch angepasst werden können. Je höher diese Anforderungen sind, desto schwieriger wird es eine Brute-Force-Attacke durchzuführen. Gleichzeitig wird ein Wörterbuchangriff durch die Verwendung von Salts verhindert. Die Parameter N, R und P für den SCrypt-Algorithmus wurden nach öffentlichen Empfehlungen gewählt. Eine schnelle Zeitmessung ergab, dass eine Hashwertberechnung ca. 100 ms dauert. Das ist für den gedachten Gebrauch als Chatserver, an dem sich nicht sehr oft angemeldet wird, absolut ausreichend. Für eine Brute-Force-Attacke stellt diese Zahl allerdings eine große Herausforderung dar, da auf einem Prozessor nur ca. 10 Versuche pro Sekunde durchgeführt werden können, während bei Passwörtern, die mit einer weniger aufwändigen Hashfunktion verschlüsselt wurden, oft tausende Versuche pro Sekunde durchgeführt werden können.
+
+  public class Authenticator {
+
+    private final static int SALT_BYTES = 32;
+    private final static int HASH_BYTES = 128;
+    private final static int SCRYPT_N = 16_384; // 2 ^ 14
+    private final static int SCRYPT_R = 8;
+    private final static int SCRYPT_P = 1;
+
+    private final AuthStore store = new FileAuthStore("sagma.auth");
+
+    public int register(String username, String password) {
+      if (store.hasUser(username))
+        return STATUS_USERNAME_TAKEN;
+      if (password.isEmpty())
+        return STATUS_INVALID_PASSWORD;
+      SecureRandom random = new SecureRandom();
+      byte[] salt = random.generateSeed(SALT_BYTES);
+      byte[] hash = generateHash(password, salt);
+      store.addUser(username, salt, hash);
+      return STATUS_OK;
+    }
+
+    public int logIn(String username, String password) {
+      if (!store.hasUser(username))
+        return STATUS_INVALID_CREDENTIALS;
+      byte[] salt = store.getSalt(username);
+      byte[] expected = store.getHash(username);
+      byte[] hash = generateHash(password, salt);
+      return Arrays.equals(hash, expected) ? STATUS_OK : STATUS_INVALID_CREDENTIALS;
+    }
+
+    private byte[] generateHash(String password, byte[] salt) {
+      try {
+        byte[] pw = password.getBytes("UTF-8");
+        return SCrypt.generate(pw, salt, SCRYPT_N, SCRYPT_R, SCRYPT_P, HASH_BYTES);
+      } catch (UnsupportedEncodingException e) {
+        // UTF-8 must be supported
+        throw new RuntimeException("UTF-8 not supported.", e);
+      }
+    }
+
+  }
+
+Das AuthStore-Interface bietet Methoden um Benutzern Salts und Hashwerte zuzuordnen und wieder abzufragen. Falls eine andere Speichermethode, z. B. eine Datenbank, hinzugefügt werden soll, muss nur dieses Interface implementiert werden. Die in-memory Implementierung ist trivial.
+
+  public interface AuthStore {
+
+    /**
+     * Checks whether a record for the given username exists.
+     * 
+     * @param username not null
+     */
+    boolean hasUser(String username);
+
+    /**
+     * Adds a new record to the auth store. If a record with the given username already exists, it will be overwritten.
+     * 
+     * @param username not null
+     * @param salt not null
+     * @param hash not null
+     */
+    void addUser(String username, byte[] salt, byte[] hash);
+
+    /**
+     * Returns the salt associated with the username.
+     * 
+     * @param username not null
+     * @return the salt for the user or null if no record was found
+     */
+    byte[] getSalt(String username);
+
+    /**
+     * Returns the hash associated with the username.
+     * 
+     * @param username not null
+     * @return the hash for the user or null if no record was found
+     */
+    byte[] getHash(String username);
+
+  }
+
+  public class InMemoryAuthStore implements AuthStore {
+
+    protected final Map<String, byte[]> salts = new HashMap<>();
+    protected final Map<String, byte[]> hashes = new HashMap<>();
+
+    @Override
+    public boolean hasUser(String username) {
+      return salts.containsKey(username);
+    }
+
+    @Override
+    public void addUser(String username, byte[] salt, byte[] hash) {
+      salts.put(username, salt);
+      hashes.put(username, hash);
+    }
+
+    @Override
+    public byte[] getSalt(String username) {
+      return salts.get(username);
+    }
+    @Override
+    public byte[] getHash(String username) {
+      return hashes.get(username);
+    }
+
+  }
+
+Die Klasse FileAuthStore speichert die Hashwerte in einer Textdatei. Der Einfachheit halber wurde FileAuthStore als Unterklasse von InMemoryAuthStore angelegt, da die Funktionalität des Abfragens identisch ist. Nur im Konstruktor müssen die Werte aus der Datei geladen werden (falls vorhanden) und wenn ein neuer Wert eingefügt wird, dann sollen alle Werte in die Datei exportiert werden.
+
+Die Byte-Arrays werden mittels zweier Hilfsmethoden als hexadezimaler Text abgespeichert.
+
+  public class FileAuthStore extends InMemoryAuthStore {
+
+    private final String filename;
+
+    public FileAuthStore(String filename) {
+      this.filename = filename;
+      try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          if (line.isEmpty())
+            continue;
+          String[] parts = line.split("\t");
+          if (parts.length != 3) // ignore malformed lines
+            continue;
+          byte[] salt = parseHexadecimal(parts[1]);
+          byte[] hash = parseHexadecimal(parts[2]);
+          if (salt != null && hash != null)
+            super.addUser(parts[0], salt, hash);
+        }
+      } catch (IOException ignored) {}
+    }
+
+    @Override
+    public void addUser(String username, byte[] salt, byte[] hash) {
+      super.addUser(username, salt, hash);
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+        Set<String> users = hashes.keySet();
+        for (String user : users) {
+          writer.write(user);
+          writer.write("\t");
+          writer.write(toHexadecimal(getSalt(user)));
+          writer.write("\t");
+          writer.write(toHexadecimal(getHash(user)));
+          writer.newLine();
+        }
+      } catch (IOException ignored) {}
+    }
+
+    private static final String HEX_CHARS = "0123456789abcdef";
+
+    private byte[] parseHexadecimal(String text) {
+      if (!text.matches("(?:[0-9a-fA-F]{2})*"))
+        return null;
+      text = text.toLowerCase();
+      byte[] values = new byte[text.length() / 2];
+      for (int i = 0; i < values.length; i++) {
+        char highChar = text.charAt(2 * i + 0);
+        char lowChar = text.charAt(2 * i + 1);
+        int high = HEX_CHARS.indexOf(highChar);
+        int low = HEX_CHARS.indexOf(lowChar);
+        values[i] = (byte) ((high << 4) | (low));
+      }
+      return values;
+    }
+
+    private String toHexadecimal(byte[] values) {
+      StringBuilder result = new StringBuilder(2 * values.length);
+      for (byte byteValue : values) {
+        int intValue = Byte.toUnsignedInt(byteValue);
+        int high = intValue >> 4;
+        int low = intValue & 0xf;
+        result.append(HEX_CHARS.charAt(high));
+        result.append(HEX_CHARS.charAt(low));
+      }
+      return result.toString();
+    }
+
+  }

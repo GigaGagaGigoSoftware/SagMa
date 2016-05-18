@@ -544,9 +544,9 @@ public class ChatController implements Handler {
 			this.partner = partner;
 			this.setMaxHeight(10);
 			if (isGroup) {
-				chatIcon = new Image(getClass().getResourceAsStream("../img/group.png"));
+				chatIcon = new Image(Main.class.getResourceAsStream("img/group.png"));
 			} else {
-				chatIcon = new Image(getClass().getResourceAsStream("../img/person.png"));
+				chatIcon = new Image(Main.class.getResourceAsStream("img/person.png"));
 			}
 			ImageView iconView = new ImageView(chatIcon);
 			iconView.setFitHeight(5);
